@@ -95,9 +95,14 @@ docker build -t sisteped_app .
 ```
 Rodar o Container
 
-```
-docker run -d --name sisteped --network host -e DB_HOST=localhost sisteped_app
-```
+- Windows/Mac
+    ```
+    docker run -d --name sisteped -p 5000:5000 -e DB_HOST=host.docker.internal sisteped_app
+    ```
+- Linux:
+    ```
+    docker run -d --name sisteped --network host -e DB_HOST=localhost sisteped_app
+    ```
 
 Remove o Container
 
