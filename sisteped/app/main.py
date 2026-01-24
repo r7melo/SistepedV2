@@ -18,6 +18,5 @@ app.secret_key = 'chave_super_secreta_do_sisteped'
 # Registra as rotas
 app.register_blueprint(auth_bp)
 
-if __name__ == '__main__':
-    print("--- Sisteped Rodando na porta 5000 ---")
-    app.run(debug=True, port=5000)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)

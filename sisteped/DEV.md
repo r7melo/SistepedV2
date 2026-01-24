@@ -85,4 +85,23 @@ pip install --upgrade nome-da-biblioteca
 pip freeze > requirements.txt
 ```
 
+## 9. Configuração com Docker
+
+
+Build da Imagem Docker
+
+```
+docker build -t sisteped_app .
+```
+Rodar o Container
+
+```
+docker run -d --name sisteped --network host -e DB_HOST=localhost sisteped_app
+```
+
+Remove o Container
+
+```
+docker rm -f sisteped
+```
 

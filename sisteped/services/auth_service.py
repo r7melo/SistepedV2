@@ -1,8 +1,11 @@
 import mysql.connector
+import os
 
-# Configurações do Banco (Do seu Docker)
+# Configuração do banco de dados
+DB_HOST = os.getenv('DB_HOST', 'host.docker.internal') 
+
 DB_CONFIG = {
-    'host': 'localhost',
+    'host': DB_HOST,
     'user': 'root',
     'password': 'DB!pass00',
     'database': 'sisteped',
@@ -18,6 +21,7 @@ def get_db_connection():
         print(f"Erro de conexão: {err}")
         return None
 
+# ... o resto do seu código continua igual ...
 def validar_usuario(email, senha):
     """Verifica se email e senha existem no banco"""
     conn = get_db_connection()
