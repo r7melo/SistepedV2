@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sisteped</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="layout-wrapper">
+        
+        <aside class="sidebar">
+            <div class="logo">Sisteped</div>
+
+            <div class="menu-group">
+                <h3>Geral</h3>
+                <nav>
+                    <a href="#" class="menu-item active">Turmas</a>
+                    <a href="#" class="menu-item">Alunos</a>
+                    <a href="#" class="menu-item">Notas</a>
+                </nav>
+            </div>
+
+            <div class="menu-group">
+                <h3>Monitoramento</h3>
+                <nav>
+                    <a href="#" class="menu-item">Graficos</a>
+                    <a href="#" class="menu-item">Relatórios</a>
+                </nav>
+            </div>
+
+            <div class="menu-footer">
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout">Sair</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            </main>
+
+    </div>
+
+</body>
+</html>

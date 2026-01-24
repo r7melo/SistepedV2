@@ -1,0 +1,255 @@
+/* =========================================
+   1. RESET E CONFIGURAÇÕES GERAIS
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #000;
+    height: 100vh;
+    /* Se for página de login, o flex ajuda a centralizar/alinhar */
+    /* Se for menu, o overflow hidden evita barra de rolagem dupla */
+}
+
+/* =========================================
+   2. TELA DE LOGIN (Minimalista)
+   ========================================= */
+
+/* Classe específica para o body do Login */
+.login-body {
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: flex-start; /* Alinha no topo (não no centro vertical) */
+    padding-top: 100px;      /* Espaço do topo para o título */
+    min-height: 100vh;
+    background-color: #ffffff;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Título "Sisteped" no topo */
+.brand-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #000;
+    letter-spacing: -0.5px;
+}
+
+.login-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Inputs do Login */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e5e7eb; /* Borda cinza clara */
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #111;
+    outline: none;
+    transition: all 0.2s;
+    background-color: #fff;
+}
+
+.input-group input:focus {
+    border-color: #000; /* Fica preto ao focar */
+    box-shadow: 0 0 0 1px #000;
+}
+
+.input-group input::placeholder {
+    color: #9ca3af;
+}
+
+/* Botões Pretos (Estilo Apple/Moderno) */
+.btn-black {
+    width: 100%;
+    padding: 12px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 5px;
+}
+
+.btn-black:hover {
+    background-color: #333333;
+}
+
+/* Divisor "ou" */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 25px 0;
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.divider span {
+    padding: 0 10px;
+}
+
+/* Termos no rodapé */
+.terms {
+    margin-top: 30px;
+    font-size: 0.75rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.terms strong {
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Mensagens de Erro (Flask Flash) */
+.error-banner {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid #fecaca;
+}
+
+/* =========================================
+   3. TELA DE MENU / DASHBOARD (SistePad)
+   ========================================= */
+
+/* Container Flex para Sidebar + Conteúdo */
+.layout-wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden; /* Evita rolagem na página inteira */
+}
+
+/* Barra Lateral (Sidebar) */
+.sidebar {
+    width: 250px; /* Largura fixa */
+    background-color: #ffffff;
+    height: 100%;
+    padding: 30px 24px;
+    border-right: 1px solid #f0f0f0; /* Linha divisória sutil */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Garante que não encolha */
+}
+
+/* Logo na Sidebar */
+.logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #000;
+    padding-left: 8px;
+}
+
+/* Grupos de Menu (Geral, Monitoramento) */
+.menu-group {
+    margin-bottom: 30px;
+}
+
+.menu-group h3 {
+    font-size: 0.85rem;
+    font-weight: 700; /* Negrito forte */
+    color: #000;
+    margin-bottom: 12px;
+    padding-left: 8px;
+}
+
+/* Links do Menu */
+.menu-item {
+    display: block;
+    text-decoration: none;
+    color: #374151; /* Cinza escuro */
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background-color: #f3f4f6; /* Hover cinza claro */
+    color: #000;
+}
+
+/* Item Ativo (Selecionado) - Igual imagem "Turmas" */
+.menu-item.active {
+    background-color: #f3f4f6;
+    color: #000;
+    font-weight: 600;
+}
+
+/* Rodapé do Menu (Sair) */
+.menu-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid transparent;
+    padding-left: 8px;
+}
+
+.btn-logout {
+    text-decoration: none;
+    color: #ef4444; /* Vermelho */
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+}
+
+.btn-logout:hover {
+    color: #b91c1c;
+}
+
+/* Conteúdo Principal (Direita) */
+.main-content {
+    flex: 1; /* Ocupa o resto da tela */
+    padding: 40px;
+    background-color: #ffffff;
+    overflow-y: auto; /* Permite rolar apenas o conteúdo */
+}
