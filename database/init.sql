@@ -170,9 +170,3 @@ CREATE TABLE IF NOT EXISTS ProfessorDisciplina (
         FOREIGN KEY (idDisciplina)
         REFERENCES Disciplina(idDisciplina)
 );
-
--- ============================
--- SEED ADMIN USER
--- ============================
-INSERT IGNORE INTO Users (Name, Email) VALUES ('Admin', 'admin@sisteped.com');
-INSERT IGNORE INTO UserCredentials (UserId, PasswordHash, Role) VALUES (1, '1234', 'Admin');

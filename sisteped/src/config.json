@@ -1,5 +1,5 @@
 {
-  "DB_HOST": "host.docker.internal",
+  "DB_HOST": "localhost",
   "DB_USER": "root",
   "DB_PASSWORD": "DB!pass00",
   "DB_NAME": "sisteped",

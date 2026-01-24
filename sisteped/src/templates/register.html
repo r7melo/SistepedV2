@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sisteped - Login</title>
+    <title>Sisteped - Cadastro</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,8 +13,8 @@
         <h1 class="brand-title">Sisteped</h1>
 
         <div class="login-card">
-            <h2>Login</h2>
-            <p class="subtitle">Digite seu e-mail e senha para logar no aplicativo</p>
+            <h2>Crie sua conta</h2>
+            <p class="subtitle">Preencha os dados abaixo para começar</p>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -26,29 +26,33 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('auth.login') }}">
+            <form method="POST" action="{{ url_for('auth.register') }}">
                 <div class="input-group">
-                    <input type="text" name="username" placeholder="email@dominio.com" required>
+                    <input type="text" name="name" placeholder="Seu nome completo" required>
+                </div>
+                
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="email@dominio.com" required>
                 </div>
 
                 <div class="input-group">
-                    <input type="password" name="password" placeholder="digite sua senha" required>
+                    <input type="password" name="password" placeholder="Crie uma senha" required>
                 </div>
 
-                <button type="submit" class="btn-black">Entrar</button>
+                <div class="input-group">
+                    <input type="password" name="confirm_password" placeholder="Confirme a senha" required>
+                </div>
+
+                <button type="submit" class="btn-black">Cadastrar</button>
             </form>
 
             <div class="divider">
-                <span>ou</span>
+                <span>já tem conta?</span>
             </div>
 
-            <a href="{{ url_for('auth.register') }}" style="text-decoration: none;">
-                <button type="button" class="btn-black">Cadastre-se com e-mail</button>
+            <a href="{{ url_for('auth.login') }}">
+                <button type="button" class="btn-black" style="background-color: #fff; color: #000; border: 1px solid #e5e7eb;">Fazer Login</button>
             </a>
-
-            <p class="terms">
-                Ao continuar, você concorda com os nossos <strong>Termos de Serviço</strong> e <strong>Política de Privacidade</strong>
-            </p>
         </div>
     </div>
 
