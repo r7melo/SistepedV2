@@ -56,11 +56,13 @@ pip install -r requirements.txt
 
 ---
 
-## 6. Execução do Projeto
+## 6. Execução do Projeto (Desenvolvimento)
 
 ```
-python app/main.py
+python run.py --dev
 ```
+
+0BS: Verificar o **db_host** se está de acordo com o ambiente.
 
 ---
 
@@ -97,11 +99,11 @@ Rodar o Container
 
 - Windows/Mac
     ```
-    docker run -d --name sisteped -p 5000:5000 -e DB_HOST=host.docker.internal sisteped_app
+    docker run -d --name sisteped -p 5000:5000 sisteped_app
     ```
 - Linux:
     ```
-    docker run -d --name sisteped --network host -e DB_HOST=localhost sisteped_app
+    docker run -d --name sisteped --network host sisteped_app
     ```
 
 Remove o Container
