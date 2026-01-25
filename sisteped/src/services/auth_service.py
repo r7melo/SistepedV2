@@ -35,18 +35,15 @@ def criar_usuario(nome, email, senha):
     try:
         cursor = conn.cursor()
         
-        # 1. Verifica se email já existe
         cursor.execute("SELECT Id FROM Users WHERE Email = %s", (email,))
         if cursor.fetchone():
             return False, "E-mail já cadastrado."
 
-        # 2. Insere na tabela Users
         query_user = "INSERT INTO Users (Name, Email) VALUES (%s, %s)"
         cursor.execute(query_user, (nome, email))
         user_id = cursor.lastrowid
 
-        # 3. Insere na tabela UserCredentials com HASH
-        senha_hash = generate_password_hash(senha) # Criptografa aqui
+        senha_hash = generate_password_hash(senha) 
         query_cred = "INSERT INTO UserCredentials (UserId, PasswordHash, Role) VALUES (%s, %s, 'User')"
         cursor.execute(query_cred, (user_id, senha_hash))
 
@@ -71,7 +68,6 @@ def validar_usuario(email, senha_informada):
     try:
         cursor = conn.cursor(dictionary=True)
         
-        # AQUI MUDOU: Buscamos o Hash do banco, não comparamos direto no SQL
         query = """
             SELECT u.Id, u.Name, u.Email, uc.Role, uc.PasswordHash
             FROM Users u
@@ -81,11 +77,10 @@ def validar_usuario(email, senha_informada):
         cursor.execute(query, (email,))
         user = cursor.fetchone()
 
-        # Se achou o usuário, verifica a senha
         if user and check_password_hash(user['PasswordHash'], senha_informada):
             return user
         
-        return None # Usuário não achado ou senha errada
+        return None
 
     except Exception as e:
         print(f"Erro na validação: {e}")

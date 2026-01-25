@@ -16,17 +16,17 @@
             <div class="menu-group">
                 <h3>Geral</h3>
                 <nav>
-                    <a href="#" class="menu-item active">Turmas</a>
-                    <a href="#" class="menu-item">Alunos</a>
-                    <a href="#" class="menu-item">Notas</a>
+                    <a href="{{ url_for('turmas.index') }}" class="menu-item">Turmas</a>
+                    <a href="{{ url_for('alunos.index') }}" class="menu-item">Alunos</a>
+                    <a href="{{ url_for('notas.index') }}" class="menu-item">Notas</a>
                 </nav>
             </div>
 
             <div class="menu-group">
                 <h3>Monitoramento</h3>
                 <nav>
-                    <a href="#" class="menu-item">Graficos</a>
-                    <a href="#" class="menu-item">Relatórios</a>
+                    <a href="{{ url_for('graficos.index') }}" class="menu-item">Gráficos</a>
+                    <a href="{{ url_for('relatorios.index') }}" class="menu-item">Relatórios</a>
                 </nav>
             </div>
 
@@ -36,7 +36,9 @@
         </aside>
 
         <main class="main-content">
-            </main>
+            {% block content %}
+            {% endblock %}
+        </main>
 
     </div>
 
