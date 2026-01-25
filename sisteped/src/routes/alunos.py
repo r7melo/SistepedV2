@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from ..services.aluno_service import criar_aluno
 
 alunos_bp = Blueprint('alunos', __name__, url_prefix='/alunos')
 
@@ -9,9 +10,25 @@ def index():
     
     return render_template('alunos.html', nome=session.get('user_name'))
 
-@alunos_bp.route('/cadastrar_aluno', methods=['GET'])
+@alunos_bp.route('/cadastrar_aluno', methods=['GET', 'POST'])
 def cadastrar_aluno():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
-    
-    return render_template('cadastrar_aluno.html', nome=session.get('user_name'))
+    if 'user_id' not in session: return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        dados_formulario = {
+            'nome': request.form.get('nome'),
+            'cpf': request.form.get('cpf'),
+            'identidade': request.form.get('identidade'),
+            'nome_pai': request.form.get('nome_pai'),
+            'nome_mae': request.form.get('nome_mae'),
+            'email': request.form.get('email'),
+            'telefone': request.form.get('telefone')
+        }
+
+        if criar_aluno(dados_formulario):
+            flash('Aluno cadastrado com sucesso!', 'success')
+            return redirect(url_for('alunos.cadastrar_aluno'))
+        else:
+            flash('Erro ao cadastrar. Verifique os dados.', 'error')
+
+    return render_template('cadastrar_aluno.html')

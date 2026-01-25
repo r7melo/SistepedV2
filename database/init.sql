@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS Aluno (
     nacionalidade VARCHAR(100),
     identidade VARCHAR(50),
     cpf VARCHAR(14) UNIQUE,
-    idTurma INT NOT NULL,
+    idTurma INT NULL,
     CONSTRAINT FK_Aluno_Turma
         FOREIGN KEY (idTurma)
         REFERENCES Turma(idTurma)
