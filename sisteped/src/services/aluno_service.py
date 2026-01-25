@@ -1,30 +1,39 @@
 from .db import get_db_connection
 
 def criar_aluno(dados):
+    """
+    Recebe um dicionário com os dados do formulário e salva no banco.
+    """
     conn = get_db_connection()
-    if not conn: return False
-
+    if not conn:
+        return False
+    
     try:
         cursor = conn.cursor()
         
-        filiacao_completa = f"Pai: {dados['nome_pai']} | Mãe: {dados['nome_mae']}"
+        pai = dados.get('nome_pai', '')
+        mae = dados.get('nome_mae', '')
+        filiacao = f"Pai: {pai} | Mãe: {mae}"
 
         query_aluno = """
-            INSERT INTO Aluno (nomeCompleto, cpf, identidade, filiacao, idTurma) 
+            INSERT INTO Aluno (nomeCompleto, cpf, identidade, filiacao, idTurma)
             VALUES (%s, %s, %s, %s, %s)
         """
         cursor.execute(query_aluno, (
             dados['nome'], 
             dados['cpf'], 
             dados['identidade'], 
-            filiacao_completa,
-            None
+            filiacao, 
+            dados['turma_id']
         ))
         
         id_novo_aluno = cursor.lastrowid
 
-        if dados['email'] or dados['telefone']:
-            query_contato = "INSERT INTO Contato (email, telefone, idAluno) VALUES (%s, %s, %s)"
+        if dados.get('email') or dados.get('telefone'):
+            query_contato = """
+                INSERT INTO Contato (email, telefone, idAluno)
+                VALUES (%s, %s, %s)
+            """
             cursor.execute(query_contato, (dados['email'], dados['telefone'], id_novo_aluno))
 
         conn.commit()
@@ -32,11 +41,11 @@ def criar_aluno(dados):
 
     except Exception as e:
         print(f"Erro ao criar aluno: {e}")
-        conn.rollback()
         return False
     finally:
-        cursor.close()
-        conn.close()
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 
 def listar_alunos():
