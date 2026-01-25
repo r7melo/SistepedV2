@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, session, redirect, url_for
+from flask import Blueprint, flash, render_template, request, session, redirect, url_for
+from ..services.turma_service import criar_turma, listar_turmas
 
 turmas_bp = Blueprint('turmas', __name__, url_prefix='/turmas')
 
@@ -7,12 +8,25 @@ def index():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
-    return render_template('turmas.html', nome=session.get('user_name'))
-
-
-@turmas_bp.route('/cadastrar_turma', methods=['GET'])
-def cadastrar_turma():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    lista_de_turmas = listar_turmas()
     
-    return render_template('cadastrar_turma.html', nome=session.get('user_name'))
+    return render_template('turmas.html', turmas=lista_de_turmas)
+
+
+@turmas_bp.route('/cadastrar_turma', methods=['GET', 'POST'])
+def cadastrar_turma():
+    if 'user_id' not in session: return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        ano = request.form.get('ano')
+        
+        if criar_turma(nome, ano):
+            flash('Turma criada com sucesso!', 'success')
+            return redirect(url_for('turmas.cadastrar_turma'))
+        else:
+            flash('Erro ao criar turma.', 'error')
+
+    return render_template('cadastrar_turma.html')
+
+

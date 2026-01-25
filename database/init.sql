@@ -170,3 +170,6 @@ CREATE TABLE IF NOT EXISTS ProfessorDisciplina (
         FOREIGN KEY (idDisciplina)
         REFERENCES Disciplina(idDisciplina)
 );
+
+
+INSERT INTO Escola (instituicaoEscolar) VALUES ('Escola Modelo Sisteped');
