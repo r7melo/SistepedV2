@@ -1,14 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from ..services.aluno_service import criar_aluno
+from ..services.aluno_service import criar_aluno, listar_alunos
 
 alunos_bp = Blueprint('alunos', __name__, url_prefix='/alunos')
 
-@alunos_bp.route('/')
+@alunos_bp.route('/', methods=['GET'])
 def index():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    if 'user_id' not in session: return redirect(url_for('auth.login'))
     
-    return render_template('alunos.html', nome=session.get('user_name'))
+    lista_alunos = listar_alunos()
+    
+    return render_template('alunos.html', alunos=lista_alunos)
 
 @alunos_bp.route('/cadastrar_aluno', methods=['GET', 'POST'])
 def cadastrar_aluno():
@@ -32,3 +33,5 @@ def cadastrar_aluno():
             flash('Erro ao cadastrar. Verifique os dados.', 'error')
 
     return render_template('cadastrar_aluno.html')
+
+

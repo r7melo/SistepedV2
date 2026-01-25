@@ -37,3 +37,30 @@ def criar_aluno(dados):
     finally:
         cursor.close()
         conn.close()
+
+
+def listar_alunos():
+    conn = get_db_connection()
+    resultados = []
+    if conn:
+        try:
+            cursor = conn.cursor(dictionary=True)
+ 
+            query = """
+                SELECT 
+                    a.idAluno, 
+                    a.nomeCompleto, 
+                    a.cpf, 
+                    t.nome AS nome_turma
+                FROM Aluno a
+                LEFT JOIN Turma t ON a.idTurma = t.idTurma
+                ORDER BY a.nomeCompleto ASC
+            """
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+        except Exception as e:
+            print(f"Erro ao listar alunos: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+    return resultados
