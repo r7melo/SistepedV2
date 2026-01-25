@@ -1,5 +1,5 @@
 {
-  "DB_HOST": "10.0.0.10",
+  "DB_HOST": "localhost",
   "DB_USER": "root",
   "DB_PASSWORD": "DB!pass00",
   "DB_NAME": "sisteped",

@@ -4,14 +4,14 @@
 <div class="page-container">
     
     <div class="page-header">
-        <h2>Notas</h2>
+        <h2>Histórico de Notas</h2>
     </div>
 
     <div class="toolbar">
         <div class="toolbar-left">
             <div class="search-box">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" placeholder="Buscar itens...">
+                <input type="text" placeholder="Buscar aluno...">
             </div>
 
             <button class="btn-outline">
@@ -19,21 +19,7 @@
                 Filtrar
             </button>
 
-            <a href="{{ url_for('notas.cadastrar_notas') }}"><button class="btn-black small">Cadastrar</button></a>
-        </div>
-
-        <div class="toolbar-right">
-            <div class="view-toggles">
-                <button class="icon-btn active">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                </button>
-                <button class="icon-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                </button>
-                <button class="icon-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </button>
-            </div>
+            <a href="{{ url_for('notas.cadastrar_notas') }}"><button class="btn-black small">Lançar Novas</button></a>
         </div>
     </div>
 
@@ -41,73 +27,47 @@
         <table class="clean-table">
             <thead>
                 <tr>
-                    <th>Atividade</th>
+                    <th style="width: 35%;">Aluno</th>
                     <th>Turma</th>
                     <th>Disciplina</th>
-                    <th class="text-gray">Data da aplicação</th>
+                    <th>Nota</th> <th class="text-gray">Data</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><strong>Prova Final</strong></td>
-                    <td><span class="badge">CR002</span></td>
-                    <td><span class="badge">Matemática</span></td>
-                    <td class="text-gray">12/12/2025</td>
-                    <td class="text-right">
-                        <button class="icon-btn-sm">•••</button>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td><strong>Trabalho I</strong></td>
-                    <td><span class="badge">CR003</span></td>
-                    <td><span class="badge">Física</span></td>
-                    <td class="text-gray">13/02/2025</td>
-                    <td class="text-right">
-                        <button class="icon-btn-sm">•••</button>
-                    </td>
-                </tr>
+                {% if notas %}
+                    {% for nota in notas %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; flex-direction: column;">
+                                <strong style="font-size: 0.95rem;">{{ nota.nome_aluno }}</strong>
+                                <span style="font-size: 0.8rem; color: #666;">{{ nota.atividade }}</span>
+                            </div>
+                        </td>
+                        
+                        <td><span class="badge">{{ nota.nome_turma }}</span></td>
+                        <td><span class="badge" style="background: #f3f4f6; color: #374151;">{{ nota.disciplina }}</span></td>
+                        
+                        <td>
+                            <strong style="color: {% if nota.nota >= 6 %}#059669{% else %}#dc2626{% endif %};">
+                                {{ nota.nota }}
+                            </strong>
+                        </td>
 
-                <tr>
-                    <td><strong>Prova Final</strong></td>
-                    <td><span class="badge">CR003</span></td>
-                    <td><span class="badge">Matemática</span></td>
-                    <td class="text-gray">12/12/2025</td>
-                    <td class="text-right">
-                        <button class="icon-btn-sm">•••</button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><strong>Prova I</strong></td>
-                    <td><span class="badge">CR002</span></td>
-                    <td><span class="badge">Matemática</span></td>
-                    <td class="text-gray">22/02/2025</td>
-                    <td class="text-right">
-                        <button class="icon-btn-sm">•••</button>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td><strong>Prova Final</strong></td>
-                    <td><span class="badge">CR004</span></td>
-                    <td><span class="badge">Física</span></td>
-                    <td class="text-gray">12/12/2025</td>
-                    <td class="text-right">
-                        <button class="icon-btn-sm">•••</button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><strong>Prova II</strong></td>
-                    <td><span class="badge">CR005</span></td>
-                    <td><span class="badge">Física</span></td>
-                    <td class="text-gray">27/05/2025</td>
-                    <td class="text-right">
-                        <button class="icon-btn-sm">•••</button>
-                    </td>
-                </tr>
+                        <td class="text-gray">{{ nota.data.strftime('%d/%m/%Y') if nota.data else '-' }}</td>
+                        
+                        <td class="text-right">
+                            <button class="icon-btn-sm">•••</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding: 40px; color: #666;">
+                            Nenhuma nota lançada no sistema.
+                        </td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>

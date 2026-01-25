@@ -63,8 +63,8 @@ python run.py --dev
 ```
 
 0BS: Verificar o **config.db_host** se está de acordo com o ambiente.
-- Windows:host.docker.internal
-- Linux:localhost
+- Windows: `host.docker.internal`
+- Linux: `localhost`
 
 ---
 

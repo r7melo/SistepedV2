@@ -4,93 +4,112 @@
 <div class="page-container">
     
     <div class="page-header">
-        <h2>Cadastro de Notas</h2>
+        <h2>Lançamento de Notas</h2>
     </div>
 
-    <div class="content-card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 40px; max-width: 900px; margin: 0 auto;">
+    <div class="content-card">
         
-        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 30px; color: #111;">Adição de Notas</h3>
+        <h3>Dados da Avaliação</h3>
 
-        <form>
-            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Título da Atividade</label>
-                    <input type="text" placeholder="Ex: Avaliação 1" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem;">
+        <form action="{{ url_for('notas.cadastrar_notas') }}" method="POST"> 
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Selecione a Turma</label>
+                    <select name="turma" id="select-turma" class="form-control" onchange="carregarAlunos()" required>
+                        <option value="" disabled {% if not turma_atual %}selected{% endif %}>Selecione...</option>
+                        
+                        {% for t in turmas %}
+                            <option value="{{ t.idTurma }}" {% if turma_atual|string == t.idTurma|string %}selected{% endif %}>
+                                {{ t.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Data</label>
-                    <input type="date" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+
+                <div class="form-group">
+                    <label>Disciplina</label>
+                    <select name="disciplina" class="form-control" required>
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="Matemática">Matemática</option>
+                        <option value="Física">Física</option>
+                        <option value="História">História</option>
+                        <option value="Português">Português</option>
+                        <option value="Geografia">Geografia</option>
+                    </select>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Turma</label>
-                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; background-color: #fff;">
-                        <option value="" disabled selected>Selecione</option>
-                        <option value="CR002">CR002 - Terceiro A</option>
-                        <option value="CR003">CR003 - Primeiro C</option>
-                    </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Título da Atividade</label>
+                    <input type="text" name="titulo" placeholder="Ex: Prova Mensal 1" class="form-control" required>
                 </div>
-                <div style="flex: 1;">
-                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Disciplina</label>
-                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; background-color: #fff;">
-                        <option value="" disabled selected>Selecione</option>
-                        <option value="matematica">Matemática</option>
-                        <option value="fisica">Física</option>
-                    </select>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" name="data" class="form-control" required>
                 </div>
             </div>
 
-            <div class="students-box" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 40px;">
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                    <h4 style="font-size: 1rem; font-weight: 600; margin: 0;">Alunos</h4>
+            <div class="students-box">
+                <div class="students-header">
+                    <h4>
+                        {% if turma_atual %}
+                            Alunos da Turma
+                        {% else %}
+                            Selecione uma turma acima
+                        {% endif %}
+                    </h4>
                     
-                    <div style="display: flex; align-items: center; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 10px; background: #fff;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" placeholder="Buscar aluno" style="border: none; outline: none; font-size: 0.9rem; width: 150px;">
-                    </div>
+                    <span style="font-size: 0.85rem; color: #666;">
+                        {{ alunos|length }} alunos listados
+                    </span>
                 </div>
 
                 <div class="student-list">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <span style="color: #374151; font-size: 0.95rem;"><strong>1234</strong> - Francisco José Soares</span>
-                        <input type="text" placeholder="Value" style="width: 80px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center;">
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <span style="color: #374151; font-size: 0.95rem;"><strong>3421</strong> - José Soares Francisco</span>
-                        <input type="text" placeholder="Value" style="width: 80px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center;">
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <span style="color: #374151; font-size: 0.95rem;"><strong>2341</strong> - José Francisco Soares</span>
-                        <input type="text" placeholder="Value" style="width: 80px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center;">
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <span style="color: #374151; font-size: 0.95rem;"><strong>2134</strong> - Soares Francisco José</span>
-                        <input type="text" placeholder="Value" style="width: 80px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center;">
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <span style="color: #374151; font-size: 0.95rem;"><strong>3412</strong> - Francisco Silva Soares</span>
-                        <input type="text" placeholder="Value" style="width: 80px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center;">
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
-                        <span style="color: #374151; font-size: 0.95rem;"><strong>1432</strong> - Silva José Soares</span>
-                        <input type="text" placeholder="Value" style="width: 80px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; text-align: center;">
-                    </div>
+                    {% if alunos %}
+                        {% for aluno in alunos %}
+                        <div class="student-item">
+                            <span class="student-info">
+                                <strong>#{{ aluno.idAluno }}</strong> - {{ aluno.nomeCompleto }}
+                            </span>
+                            <input type="number" 
+                                   name="nota_{{ aluno.idAluno }}" 
+                                   placeholder="Nota" 
+                                   step="0.1" 
+                                   min="0" 
+                                   max="10" 
+                                   class="input-grade">
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="padding: 30px; text-align: center; color: #999;">
+                            {% if turma_atual %}
+                                Esta turma não possui alunos cadastrados.
+                            {% else %}
+                                Escolha a turma para carregar a lista de alunos.
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
-            <div style="text-align: center;">
-                <button type="submit" class="btn-black" style="padding: 12px 50px;">Salvar</button>
+            <div class="form-actions">
+                <button type="submit" class="btn-black btn-wide" {% if not alunos %}disabled{% endif %}>
+                    Salvar Notas
+                </button>
             </div>
 
         </form>
     </div>
 </div>
+
+<script>
+    function carregarAlunos() {
+        const turmaId = document.getElementById('select-turma').value;
+        if (turmaId) {
+            window.location.href = "{{ url_for('notas.cadastrar_notas') }}?turma=" + turmaId;
+        }
+    }
+</script>
 {% endblock %}
