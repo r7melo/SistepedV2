@@ -1,14 +1,143 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>Gerenciamento de Gráficos</h2>
-        <button class="btn-black" style="width: auto;">+ Novo Gráfico</button>
+<div class="page-container">
+    
+    <div class="page-header">
+        <h2>Gráficos de Desempenho</h2>
     </div>
 
-    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #e5e5e5;">
-        <p>Aqui vai entrar a lista dos teus gráficos (Exemplo: Gráfico de Notas por Turma).</p>
-        <br>
-        <p><em>(Em breve vamos puxar isso do banco de dados!)</em></p>
+    <div class="dashboard-controls">
+        <div class="class-selector">
+            <span class="selector-value">CR002 - Terceiro A</span>
+            <button class="icon-btn-sm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+
+        <div class="period-toggle">
+            <button class="toggle-btn">Mês</button>
+            <button class="toggle-btn">Trimestre</button>
+            <button class="toggle-btn active">Semestre</button>
+        </div>
     </div>
+
+    <div class="dashboard-grid">
+        
+        <div class="dashboard-card main-chart-card">
+            <h3>Desempenho Geral</h3>
+            <div class="chart-container">
+                <canvas id="desempenhoChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-sidebar">
+            
+            <div class="dashboard-card">
+                <h3>Alunos em Risco</h3>
+                <ul class="risk-list">
+                    <li>1234 - Francisco José Soares</li>
+                    <li>1234 - Soares Francisco José</li>
+                    <li>0963 - Maria da Silva</li>
+                </ul>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>Desempenho vs. Último Período</h3>
+                <div class="table-responsive">
+                    <table class="clean-table compact">
+                        <thead>
+                            <tr>
+                                <th>Aluno</th>
+                                <th class="text-right">Mudança</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-green">+84%</td>
+                            </tr>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-red">-8%</td>
+                            </tr>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-green">+2%</td>
+                            </tr>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-green">+33%</td>
+                            </tr>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-green">+30%</td>
+                            </tr>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-green">+15%</td>
+                            </tr>
+                            <tr>
+                                <td>Francisco José Soares</td>
+                                <td class="text-right text-red">-12%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('desempenhoChart').getContext('2d');
+    
+    // Configuração do Gráfico de Barras
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            datasets: [{
+                label: 'Média da Turma',
+                data: [0, 4, 5, 4, 3.5, 6, 0, 9.5, 6, 8, 0, 0], // Dados fictícios baseados na imagem
+                backgroundColor: '#000000', // Barras Pretas
+                borderRadius: 4, // Bordas arredondadas no topo
+                barPercentage: 0.6, // Largura da barra
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // Esconde a legenda pois já tem título no card
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 10,
+                    grid: {
+                        color: '#f3f4f6' // Linhas de grade bem suaves
+                    },
+                    ticks: {
+                        font: { family: 'Inter' }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false // Remove grade vertical
+                    },
+                    ticks: {
+                        font: { family: 'Inter' }
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

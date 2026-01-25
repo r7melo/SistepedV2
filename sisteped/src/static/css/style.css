@@ -265,3 +265,309 @@ body {
     text-align: center;
     border: 1px solid #bbf7d0; /* Borda verde suave */
 }
+
+/* =========================================
+   4. ESTILOS DAS PÁGINAS INTERNAS (TURMAS)
+   ========================================= */
+
+.page-container {
+    width: 100%;
+}
+
+.page-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #000;
+}
+
+/* --- Toolbar (Busca e Botões) --- */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Campo de busca customizado */
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    width: 300px;
+}
+
+.search-box svg {
+    margin-right: 8px;
+    color: #9ca3af;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 0.9rem;
+    color: #000;
+}
+
+/* Botão Outline (Branco com borda) */
+.btn-outline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: #374151;
+}
+
+.btn-outline:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+}
+
+/* Ajuste no btn-black existente para tamanhos menores */
+.btn-black.small {
+    width: auto;
+    padding: 9px 20px;
+    margin-top: 0;
+    font-size: 0.9rem;
+}
+
+/* Ícones de Visualização (Direita) */
+.view-toggles {
+    display: flex;
+    gap: 4px;
+    background: #fff; /* opcional */
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #9ca3af;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background-color: #f3f4f6;
+    color: #000;
+}
+
+.icon-btn.active {
+    background-color: #f3f4f6;
+    color: #000;
+}
+
+/* --- Tabela Limpa --- */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.clean-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Espaço entre linhas, se desejar, ou 0 para colado */
+    border-spacing: 0;
+}
+
+.clean-table th {
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #111;
+    padding: 15px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.clean-table td {
+    padding: 16px 10px;
+    font-size: 0.9rem;
+    color: #111;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.clean-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Badges (Pílulas de Texto) */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #374151;
+    background-color: #fff;
+    white-space: nowrap;
+}
+
+/* Utilitários de Texto */
+.text-gray { color: #6b7280; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.icon-btn-sm {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.icon-btn-sm:hover { color: #000; }
+
+
+/* =========================================
+   5. DASHBOARD E GRÁFICOS
+   ========================================= */
+
+/* Controles Superiores */
+.dashboard-controls {
+    display: flex;
+    justify-content: space-between; /* Espalha os itens */
+    align-items: flex-start;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.class-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 10px 15px;
+    border-radius: 6px;
+    width: 300px;
+    cursor: pointer;
+}
+
+.selector-value {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Botões de Período (Mês, Trimestre...) */
+.period-toggle {
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+.toggle-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-btn.active {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2 partes gráfico, 1 parte lateral */
+    gap: 24px;
+}
+
+/* Responsividade: Vira coluna única em telas pequenas */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cards (Caixas Brancas) */
+.dashboard-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px; /* Borda um pouco mais arredondada */
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #111;
+}
+
+/* Gráfico */
+.main-chart-card {
+    min-height: 400px;
+}
+
+.chart-container {
+    position: relative;
+    height: 350px;
+    width: 100%;
+}
+
+/* Sidebar e Listas */
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.risk-list {
+    list-style: none;
+    padding: 0;
+}
+
+.risk-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.risk-list li:last-child {
+    border-bottom: none;
+}
+
+/* Tabela Compacta para a Sidebar */
+.clean-table.compact td, 
+.clean-table.compact th {
+    padding: 10px 4px;
+    font-size: 0.85rem;
+}
+
+/* Cores de status */
+.text-green { color: #16a34a; font-weight: 600; }
+.text-red { color: #dc2626; font-weight: 600; }
