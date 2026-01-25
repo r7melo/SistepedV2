@@ -62,7 +62,9 @@ pip install -r requirements.txt
 python run.py --dev
 ```
 
-0BS: Verificar o **db_host** se está de acordo com o ambiente.
+0BS: Verificar o **config.db_host** se está de acordo com o ambiente.
+- Windows:host.docker.internal
+- Linux:localhost
 
 ---
 
@@ -112,3 +114,31 @@ Remove o Container
 docker rm -f sisteped
 ```
 
+## 10. Configuração com Docker (Servidor)
+
+Compactar imagem (Local)
+
+```
+docker save -o sisteped_app.tar sisteped_app
+```
+
+Enviar para o servidor (Local)
+```
+scp sisteped_app.tar USER@IP-SERVER:PATH
+```
+
+Carregar imagem (Server)
+
+```
+docker load -i sisteped_app.tar
+```
+
+Rodar conteiner
+```
+docker run -d --name sisteped --network host sisteped_app
+```
+
+Monitorar
+```
+docker logs sisteped --tail 50
+```

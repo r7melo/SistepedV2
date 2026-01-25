@@ -96,3 +96,28 @@ Se o banco não iniciar, verifique os logs de erro:
 ```
 docker-compose logs -f
 ```
+
+## 9. Configuração com Docker (Servidor)
+
+Compactar imagem (Local)
+
+```
+docker save -o sisteped_db.tar sisteped_db
+```
+
+Enviar para o servidor (Local)
+```
+scp sisteped_db.tar USER@IP-SERVER:PATH
+```
+
+Carregar imagem (Server)
+
+```
+docker load -i sisteped_db.tar
+```
+
+Executar imagem (Server)
+
+```
+docker load -i sisteped_db.tar
+```
