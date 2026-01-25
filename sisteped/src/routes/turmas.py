@@ -8,3 +8,11 @@ def index():
         return redirect(url_for('auth.login'))
     
     return render_template('turmas.html', nome=session.get('user_name'))
+
+
+@turmas_bp.route('/cadastrar_turma', methods=['GET'])
+def cadastrar_turma():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    
+    return render_template('cadastrar_turma.html', nome=session.get('user_name'))

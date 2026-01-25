@@ -8,3 +8,11 @@ def index():
         return redirect(url_for('auth.login'))
     
     return render_template('relatorios.html', nome=session.get('user_name'))
+
+
+@relatorios_bp.route('/gerar_relatorio', methods=['GET'])
+def gerar_relatorio():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    
+    return render_template('gerar_relatorio.html', nome=session.get('user_name'))

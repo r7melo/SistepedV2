@@ -8,3 +8,11 @@ def index():
         return redirect(url_for('auth.login'))
     
     return render_template('notas.html', nome=session.get('user_name'))
+
+
+@notas_bp.route('/cadastrar_notas', methods=['GET'])
+def cadastrar_notas():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    
+    return render_template('cadastrar_notas.html', nome=session.get('user_name'))

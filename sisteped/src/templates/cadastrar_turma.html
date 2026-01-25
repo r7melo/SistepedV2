@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+    
+    <div class="page-header">
+        <h2>Cadastro das Turmas</h2>
+    </div>
+
+    <div class="content-card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 40px; max-width: 900px; margin: 0 auto;">
+        
+        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 30px; color: #111;">Dados da turma</h3>
+
+        <form>
+            <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Nome da Turma</label>
+                    <input type="text" placeholder="Ex: Terceiro A" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Ano Letivo</label>
+                    <input type="text" placeholder="Ex: 2025" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem;">
+                </div>
+            </div>
+
+            <div class="students-box" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 40px;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h4 style="font-size: 1rem; font-weight: 600; margin: 0;">Alunos vinculados</h4>
+                    <button type="button" class="btn-black small">Vincular</button>
+                </div>
+
+                <div class="student-list">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #374151; font-size: 0.95rem;"><strong>1234</strong> - Francisco José Soares</span>
+                        <button type="button" style="border: none; background: none; font-size: 1.5rem; line-height: 1; color: #374151; cursor: pointer;">&minus;</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #374151; font-size: 0.95rem;"><strong>3421</strong> - José Soares Francisco</span>
+                        <button type="button" style="border: none; background: none; font-size: 1.5rem; line-height: 1; color: #374151; cursor: pointer;">&minus;</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #374151; font-size: 0.95rem;"><strong>2341</strong> - José Francisco Soares</span>
+                        <button type="button" style="border: none; background: none; font-size: 1.5rem; line-height: 1; color: #374151; cursor: pointer;">&minus;</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #374151; font-size: 0.95rem;"><strong>2134</strong> - Soares Francisco José</span>
+                        <button type="button" style="border: none; background: none; font-size: 1.5rem; line-height: 1; color: #374151; cursor: pointer;">&minus;</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <span style="color: #374151; font-size: 0.95rem;"><strong>3412</strong> - Francisco Silva Soares</span>
+                        <button type="button" style="border: none; background: none; font-size: 1.5rem; line-height: 1; color: #374151; cursor: pointer;">&minus;</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+                        <span style="color: #374151; font-size: 0.95rem;"><strong>1324</strong> - Silva José Francisco</span>
+                        <button type="button" style="border: none; background: none; font-size: 1.5rem; line-height: 1; color: #374151; cursor: pointer;">&minus;</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="btn-black" style="padding: 12px 40px;">Cadastrar</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

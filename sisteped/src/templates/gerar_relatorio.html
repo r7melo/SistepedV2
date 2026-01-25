@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+    
+    <div class="page-header">
+        <h2>Gerar Relatório</h2>
+    </div>
+
+    <div class="content-card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 40px; max-width: 900px; margin: 0 auto;">
+        
+        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 30px; color: #111;">Dados do Relatório</h3>
+
+        <form>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Titulo do Relatório</label>
+                <input type="text" placeholder="Ex: Relatório de notas do período" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem;">
+            </div>
+
+            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Turma</label>
+                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; background-color: #fff;">
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="CR002">CR002 - Terceiro A</option>
+                        <option value="CR003">CR003 - Primeiro C</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Disciplina</label>
+                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; background-color: #fff;">
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="matematica">Matemática</option>
+                        <option value="fisica">Física</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Data de início</label>
+                    <div style="position: relative;">
+                        <input type="date" placeholder="dd/mm/aaaa" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Data Final</label>
+                    <div style="position: relative;">
+                        <input type="date" placeholder="dd/mm/aaaa" style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; margin-bottom: 40px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.9rem; margin-bottom: 8px; color: #374151;">Tipo de relatório</label>
+                    <select style="width: 100%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.95rem; background-color: #fff;">
+                        <option value="" disabled selected>Selecione</option>
+                        <option value="notas">Notas</option>
+                        <option value="faltas">Faltas</option>
+                        <option value="comportamento">Comportamento</option>
+                    </select>
+                </div>
+                <div style="flex: 1;"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="btn-black" style="padding: 12px 40px;">Gerar relatório</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
