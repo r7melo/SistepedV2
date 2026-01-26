@@ -6,12 +6,6 @@
         <h2>Gestão de Comportamentos</h2>
     </div>
 
-    <div class="toolbar">
-        <div class="toolbar-left">
-            <button class="btn-black small" onclick="openAddModal()">Registrar Comportamento</button>
-        </div>
-    </div>
-
     <div class="table-responsive">
         <table class="clean-table">
             <thead>
@@ -45,7 +39,15 @@
             </tbody>
         </table>
     </div>
+
+    <div class="toolbar" style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
+        <button class="btn-black" style="padding: 12px 30px; font-size: 1rem;" onclick="openAddModal()">
+            Registrar Novo Comportamento
+        </button>
+    </div>
 </div>
+
+
 
 <div id="addModal" class="modal-overlay">
     <div class="modal-content">
