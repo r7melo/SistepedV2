@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Turma{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Edição de Turma</h2>
+    </div>
+
+    <div class="content-card">
+        <h3 class="section-title">Dados da turma</h3>
+
+        <form method="POST" action="{{ url_for('turmas.editar_turma', id=turma.idTurma) }}">
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">Nome da Turma</label>
+                    <input type="text" name="nome" class="form-control" value="{{ turma.nome }}" required>
+                </div>
+                <div class="form-col">
+                    <label class="form-label">Ano Letivo</label>
+                    <input type="text" name="ano" class="form-control" value="{{ turma.anoLetivo }}" required>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="submit" class="btn-black" style="padding: 12px 40px;">Salvar Alterações</button>
+                <a href="{{ url_for('turmas.index') }}" class="btn-secondary" style="margin-left: 10px;">Cancelar</a>
+            </div>
+        </form>
+
+        <div style="margin-top: 100px;">
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #fffafb; border: 1px solid #ffebeb; border-radius: 8px;">
+                <div>
+                    <strong style="color: #b91c1c;">Apagar Turma</strong>
+                    <p style="margin: 5px 0 0; font-size: 0.85rem; color: #666;">A exclusão removerá todos os registros desta turma permanentemente.</p>
+                </div>
+                <button type="button" class="btn-danger-text" onclick="openModal()">Apagar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Confirmar Exclusão</h3>
+        <p>Você tem certeza que deseja apagar a turma <strong>{{ turma.nome }}</strong>?</p>
+        <p style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-top: 10px;">
+            Esta ação não pode ser desfeita.
+        </p>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            <form action="{{ url_for('turmas.excluir_turma', id=turma.idTurma) }}" method="POST">
+                <button type="submit" class="btn-danger-confirm">Apagar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        let modal = document.getElementById('deleteModal');
+        if (event.target == modal) closeModal();
+    }
+</script>
+{% endblock %}

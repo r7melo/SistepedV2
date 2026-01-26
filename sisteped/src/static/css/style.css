@@ -731,3 +731,130 @@ body {
     padding: 12px 60px;
     font-size: 1rem;
 }
+
+/* Estilo para o botão Cancelar (Secondary) */
+.btn-secondary {
+    display: inline-block;
+    padding: 12px 40px;
+    background-color: #f3f4f6; /* Cinza claro */
+    color: #374151;           /* Texto cinza escuro */
+    border: 1px solid #e5e7eb; /* Borda sutil */
+    border-radius: 8px;        /* Arredondamento igual ao login */
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;     /* Remove sublinhado se for <a> */
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb; /* Escurece levemente no hover */
+    color: #000000;           /* Texto fica preto no hover */
+}
+
+/* Ajuste de alinhamento para os botões no formulário */
+.form-actions {
+    display: flex;
+    gap: 12px;                /* Espaço entre Salvar e Cancelar */
+    margin-top: 25px;
+}
+
+/* --- ESTILO DO MODAL (POPUP) --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #ffffff;
+    width: 95%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    animation: modalScale 0.2s ease-out;
+}
+
+@keyframes modalScale {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* --- BOTÕES DO MODAL (SIMETRIA TOTAL) --- */
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Forçamos as duas classes a terem o mesmo comportamento visual */
+.btn-secondary, 
+.btn-danger-confirm {
+    min-width: 110px;        /* Mesma largura */
+    height: 42px;           /* Mesma altura */
+    padding: 0 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;   /* Alinhamento de texto perfeito */
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+/* Estilo específico do botão CANCELAR */
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Estilo específico do botão APAGAR (Confirmação) */
+.btn-danger-confirm {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger-confirm:hover {
+    background: #dc2626;
+}
+
+/* Ajuste para o formulário não quebrar o layout */
+.modal-footer form {
+    margin: 0;
+    display: flex;
+}
+
+/* --- ESTILO DA ZONA DE PERIGO (O BOTÃO QUE ABRE O MODAL) --- */
+.btn-danger-text {
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger-text:hover {
+    background: #ef4444;
+    color: white;
+}

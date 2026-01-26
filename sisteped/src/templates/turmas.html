@@ -25,6 +25,8 @@
                 <button class="btn-black small">Cadastrar</button>
             </a>
         </div>
+
+    
     </div>
 
     <div class="table-responsive">
@@ -49,7 +51,9 @@
                     </td>
                     
                     <td class="text-right">
-                        <button class="icon-btn-sm" title="Opções">•••</button>
+                        <a href="{{ url_for('turmas.editar_turma', id=turma.idTurma) }}" class="icon-btn-sm" title="Editar">
+                            &#9998;
+                        </a>
                     </td>
                 </tr>
                 {% else %}
