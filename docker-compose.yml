@@ -1,0 +1,36 @@
+services:
+  database:
+    image: mysql:8.0
+    container_name: sisteped_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "DB!pass00"
+      MYSQL_DATABASE: "sisteped"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    container_name: sisteped_app
+    build: 
+      context: ./sisteped
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_HOST: "database"
+      DB_USER: "root"
+      DB_PASSWORD: "DB!pass00"
+      DB_NAME: "sisteped"
+
+volumes:
+  mysql_data:
