@@ -7,4 +7,4 @@ def index():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
-    return render_template('graficos.html', nome=session.get('user_name'))
+    return render_template('graficos/graficos.html', nome=session.get('user_name'))
