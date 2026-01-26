@@ -62,10 +62,6 @@ pip install -r requirements.txt
 python run.py --dev
 ```
 
-0BS: Verificar o **config.db_host** se está de acordo com o ambiente.
-- Windows: `host.docker.internal`
-- Linux: `localhost`
-
 ---
 
 ## 7. Instalação de Novas Bibliotecas
@@ -87,58 +83,4 @@ pip freeze > requirements.txt
 ```
 pip install --upgrade nome-da-biblioteca
 pip freeze > requirements.txt
-```
-
-## 9. Configuração com Docker
-
-
-Build da Imagem Docker
-
-```
-docker build -t sisteped_app .
-```
-Rodar o Container
-
-- Windows/Mac
-    ```
-    docker run -d --name sisteped -p 5000:5000 sisteped_app
-    ```
-- Linux:
-    ```
-    docker run -d --name sisteped --network host sisteped_app
-    ```
-
-Remove o Container
-
-```
-docker rm -f sisteped
-```
-
-## 10. Configuração com Docker (Servidor)
-
-Compactar imagem (Local)
-
-```
-docker save -o sisteped_app.tar sisteped_app
-```
-
-Enviar para o servidor (Local)
-```
-scp sisteped_app.tar USER@IP-SERVER:PATH
-```
-
-Carregar imagem (Server)
-
-```
-docker load -i sisteped_app.tar
-```
-
-Rodar conteiner
-```
-docker run -d --name sisteped --network host sisteped_app
-```
-
-Monitorar
-```
-docker logs sisteped --tail 50
 ```
