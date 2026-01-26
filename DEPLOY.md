@@ -19,6 +19,8 @@ Primeira execução ou mudanças estruturais.
 docker-compose up --build -d
 ```
 
+Para apagar o volume de dados: `-v`
+
 ---
 
 ## Deploy APP

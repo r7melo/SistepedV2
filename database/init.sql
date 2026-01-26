@@ -2,30 +2,6 @@ CREATE DATABASE IF NOT EXISTS sisteped;
 USE sisteped;
 
 -- ============================
--- USERS
--- ============================
-CREATE TABLE IF NOT EXISTS Users (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(150) NOT NULL,
-    Email VARCHAR(150) NOT NULL UNIQUE,
-    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt DATETIME NULL
-);
-
--- ============================
--- USER CREDENTIALS
--- ============================
-CREATE TABLE IF NOT EXISTS UserCredentials (
-    UserId INT PRIMARY KEY,
-    PasswordHash VARCHAR(255) NOT NULL,
-    Role VARCHAR(50) NOT NULL DEFAULT 'User',
-    CONSTRAINT FK_UserCredentials_Users
-        FOREIGN KEY (UserId)
-        REFERENCES Users(Id)
-        ON DELETE CASCADE
-);
-
--- ============================
 -- ESCOLA
 -- ============================
 CREATE TABLE IF NOT EXISTS Escola (
