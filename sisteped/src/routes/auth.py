@@ -44,7 +44,7 @@ def register():
 
         if sucesso:
             flash(mensagem, 'success')
-            return redirect(url_for('auth/auth.login'))
+            return redirect(url_for('auth.login'))
         else:
             flash(mensagem, 'error')
 
