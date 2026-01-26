@@ -110,13 +110,16 @@ CREATE TABLE IF NOT EXISTS Avaliacao (
 -- ============================
 CREATE TABLE IF NOT EXISTS Comportamento (
     idComportamento INT AUTO_INCREMENT PRIMARY KEY,
-    tag VARCHAR(50),
-    data DATE,
-    observacao TEXT, -- TEXT equivale ao VARCHAR(MAX)
+    tag VARCHAR(50) NOT NULL,
+    observacao TEXT,
     idAluno INT NOT NULL,
+    idProfessor INT NOT NULL,
     CONSTRAINT FK_Comportamento_Aluno
         FOREIGN KEY (idAluno)
-        REFERENCES Aluno(idAluno)
+        REFERENCES Aluno(idAluno),
+    CONSTRAINT FK_Comportamento_Professor
+        FOREIGN KEY (idProfessor)
+        REFERENCES Professor(idProfessor)
 );
 
 -- ============================

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Gestão de Comportamentos</h2>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <button class="btn-black small" onclick="openAddModal()">Registrar Comportamento</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="clean-table">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Tipo (Tag)</th>
+                    <th>Observação</th>
+                    <th class="text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in comportamentos %}
+                <tr>
+                    <td><strong>{{ c.nome_aluno }}</strong></td>
+                    <td><span class="badge">{{ c.tag }}</span></td>
+                    <td>{{ c.observacao }}</td>
+                    <td class="text-right">
+                        <button class="btn-danger-text" 
+                                onclick="openDeleteModal('{{ c.idComportamento }}', '{{ c.nome_aluno }}')">
+                            Apagar
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center" style="padding: 40px; color: #6b7280;">
+                        Nenhum registro encontrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="addModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Novo Registro</h3>
+        <form action="{{ url_for('comportamento.cadastrar') }}" method="POST">
+            <div style="margin-bottom: 15px;">
+                <label class="form-label">Aluno</label>
+                <select name="id_aluno" class="form-control" required>
+                    <option value="" disabled selected>Selecione o aluno...</option>
+                    {% for a in alunos %} 
+                        <option value="{{ a.idAluno }}">{{ a.nomeCompleto }}</option> 
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label class="form-label">Tag (Tipo)</label>
+                <div style="display: flex; gap: 8px;">
+                    <select name="tag_existente" id="tagSelect" class="form-control" onchange="atualizarObs()">
+                        <option value="" disabled selected>Selecionar tag existente...</option>
+                        {% for t in tags_existentes %}
+                            <option value="{{ t.tag }}" data-obs="{{ t.observacao }}">{{ t.tag }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="tag_nova" id="tagInput" class="form-control" style="display: none;" placeholder="Nova tag...">
+                    
+                    <button type="button" class="btn-outline" onclick="toggleModo()" title="Alternar modo texto">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label class="form-label">Observação</label>
+                <textarea name="observacao" id="obsField" class="form-control" rows="3" readonly></textarea>
+                <input type="hidden" name="modo_escrita" id="modoEscrita" value="false">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                <button type="submit" class="btn-black">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteModal" class="modal-overlay danger">
+    <div class="modal-content small">
+        <h3 style="color: #dc2626;">Confirmar Exclusão</h3>
+        <p>Tem certeza que deseja apagar o registro de <strong id="deleteTargetName"></strong>?</p>
+        <p style="color: #666; font-size: 0.85rem; margin-top: 10px;">Esta ação não pode ser desfeita.</p>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="btn-danger-confirm">Sim, Apagar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Lógica de Alternância entre Select e Input
+    function toggleModo() {
+        const select = document.getElementById('tagSelect');
+        const input = document.getElementById('tagInput');
+        const obs = document.getElementById('obsField');
+        const modo = document.getElementById('modoEscrita');
+
+        if (input.style.display === 'none') {
+            input.style.display = 'block'; 
+            select.style.display = 'none';
+            obs.readOnly = false; 
+            obs.value = ""; 
+            modo.value = "true";
+            input.required = true; 
+            select.required = false;
+        } else {
+            input.style.display = 'none'; 
+            select.style.display = 'block';
+            obs.readOnly = true; 
+            modo.value = "false";
+            input.required = false; 
+            select.required = true;
+            atualizarObs();
+        }
+    }
+
+    // Preenche a observação baseada na tag selecionada
+    function atualizarObs() {
+        const select = document.getElementById('tagSelect');
+        const obs = document.getElementById('obsField');
+        const opt = select.options[select.selectedIndex];
+        obs.value = (opt && opt.dataset.obs) ? opt.dataset.obs : "";
+    }
+
+    // Funções de Modal
+    function openAddModal() { 
+        document.getElementById('addModal').style.display = 'flex'; 
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeAddModal() { 
+        document.getElementById('addModal').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    }
+
+    function openDeleteModal(id, nome) {
+        document.getElementById('deleteTargetName').innerText = nome;
+        // Define o action do form dinamicamente
+        document.getElementById('deleteForm').action = "/comportamento/excluir/" + id;
+        document.getElementById('deleteModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() { 
+        document.getElementById('deleteModal').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    }
+
+    // Fechar ao clicar fora do modal
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            closeAddModal();
+            closeDeleteModal();
+        }
+    }
+</script>
+{% endblock %}
