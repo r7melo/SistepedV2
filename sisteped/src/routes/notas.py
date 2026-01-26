@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from src.services.disciplina_service import listar_disciplinas_por_professor
 from ..services.notas_service import atualizar_nota_individual, listar_alunos_por_turma, listar_notas, listar_turmas, remover_nota_individual, salvar_avaliacao
 
 notas_bp = Blueprint('notas', __name__, url_prefix='/notas')
@@ -25,7 +26,6 @@ def index():
 
 @notas_bp.route('/cadastrar_notas', methods=['GET', 'POST'])
 def cadastrar_notas():
-
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
@@ -57,6 +57,8 @@ def cadastrar_notas():
 
 
     turmas_lista = listar_turmas(id_professor)
+    
+    disciplinas_lista = listar_disciplinas_por_professor(id_professor)
 
     turma_selecionada = request.args.get('turma')
     alunos_lista = []
@@ -65,7 +67,14 @@ def cadastrar_notas():
         # Busca alunos da turma validando o acesso do professor
         alunos_lista = listar_alunos_por_turma(turma_selecionada, id_professor)
 
-    return render_template('notas/cadastrar_notas.html', turmas=turmas_lista, alunos=alunos_lista, turma_atual=turma_selecionada)
+
+    return render_template(
+        'notas/cadastrar_notas.html', 
+        turmas=turmas_lista, 
+        disciplinas=disciplinas_lista, 
+        alunos=alunos_lista, 
+        turma_atual=turma_selecionada
+    )
 
 
 @notas_bp.route('/atualizar_individual/<int:id>', methods=['POST'])

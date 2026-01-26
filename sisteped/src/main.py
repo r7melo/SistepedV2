@@ -5,6 +5,7 @@ from .routes.relatorios import relatorios_bp
 from .routes.alunos import alunos_bp
 from .routes.notas import notas_bp
 from .routes.turmas import turmas_bp
+from .routes.disciplinas import disciplinas_bp
 
 app = Flask(
     __name__,
@@ -22,3 +23,4 @@ app.register_blueprint(relatorios_bp)
 app.register_blueprint(alunos_bp)
 app.register_blueprint(notas_bp)
 app.register_blueprint(turmas_bp)
+app.register_blueprint(disciplinas_bp)

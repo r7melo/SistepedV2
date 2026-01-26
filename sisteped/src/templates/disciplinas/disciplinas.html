@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Disciplinas - Sisteped{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    
+    <div class="page-header">
+        <h2>Gestão de Disciplinas</h2>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" placeholder="Buscar disciplinas...">
+            </div>
+
+            <button class="btn-black small" onclick="openAddModal()">Adicionar Disciplina</button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="clean-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome da Disciplina</th>
+                    <th class="text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for disciplina in disciplinas %}
+                <tr>
+                    <td class="text-gray">D{{ '%03d' % disciplina.idDisciplina }}</td>
+                    <td><strong>{{ disciplina.nome }}</strong></td>
+                    <td class="text-right">
+                        <button class="btn-danger-text" style="padding: 4px 12px; font-size: 0.85rem;"
+                                onclick="openDeleteModal('{{ disciplina.idDisciplina }}', '{{ disciplina.nome }}')">
+                            Apagar
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center" style="padding: 40px; color: #6b7280;">
+                        Nenhuma disciplina cadastrada.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="addModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Nova Disciplina</h3>
+        <form action="{{ url_for('disciplinas.cadastrar') }}" method="POST">
+            <div style="margin: 20px 0;">
+                <label class="form-label">Nome da Disciplina</label>
+                <input type="text" name="nome" class="form-control" placeholder="Ex: Matemática" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancelar</button>
+                <button type="submit" class="btn-black">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteModal" class="modal-overlay danger">
+    <div class="modal-content small">
+        <h3 style="color: #dc2626;">Confirmar Exclusão</h3>
+        <p>Deseja realmente excluir a disciplina <strong id="deleteTargetName"></strong>?</p>
+        <p style="color: #666; font-size: 0.8rem; margin-top: 10px;">Esta ação removerá o seu vínculo com esta disciplina.</p>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="btn-danger-confirm">Sim, Apagar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function openDeleteModal(id, nome) {
+        document.getElementById('deleteTargetName').innerText = nome;
+        document.getElementById('deleteForm').action = "/disciplinas/excluir/" + id;
+        document.getElementById('deleteModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            closeAddModal();
+            closeDeleteModal();
+        }
+    }
+</script>
+{% endblock %}

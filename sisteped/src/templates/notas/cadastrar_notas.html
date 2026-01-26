@@ -30,12 +30,10 @@
                 <div class="form-group">
                     <label>Disciplina</label>
                     <select name="disciplina" class="form-control" required>
-                        <option value="" disabled selected>Selecione</option>
-                        <option value="Matemática">Matemática</option>
-                        <option value="Física">Física</option>
-                        <option value="História">História</option>
-                        <option value="Português">Português</option>
-                        <option value="Geografia">Geografia</option>
+                        <option value="" disabled selected>Selecione a disciplina...</option>
+                        {% for d in disciplinas %}
+                            <option value="{{ d.nome }}">{{ d.nome }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
