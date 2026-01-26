@@ -59,7 +59,9 @@
                     </td>
                     
                     <td class="text-right">
-                        <button class="icon-btn-sm" title="Opções">•••</button>
+                        <a href="{{ url_for('alunos.editar_aluno', id=aluno.idAluno) }}" class="icon-btn-sm" title="Editar">
+                            &#9998;
+                        </a>
                     </td>
                 </tr>
                 {% else %}

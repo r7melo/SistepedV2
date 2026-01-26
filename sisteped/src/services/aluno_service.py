@@ -78,3 +78,128 @@ def listar_alunos(id_professor):
             cursor.close()
             conn.close()
     return resultados
+
+
+def obter_aluno_por_id(id_aluno):
+    conn = get_db_connection()
+    if not conn: return None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT 
+                a.idAluno, 
+                a.nomeCompleto, 
+                a.cpf, 
+                a.identidade, 
+                a.filiacao, 
+                a.idTurma,
+                c.email AS contato_email, 
+                c.telefone AS contato_tel,
+                t.nome AS nomeTurma
+            FROM Aluno a
+            LEFT JOIN Contato c ON a.idAluno = c.idAluno
+            LEFT JOIN Turma t ON a.idTurma = t.idTurma
+            WHERE a.idAluno = %s
+            LIMIT 1
+        """
+        
+        cursor.execute(query, (id_aluno,))
+        aluno_db = cursor.fetchone()
+        
+        if not aluno_db:
+            return None
+
+        filiacao_bruta = aluno_db.get('filiacao') or ""
+        pai, mae = "", ""
+        
+        if "|" in filiacao_bruta:
+            partes = filiacao_bruta.split("|")
+            pai = partes[0].replace("Pai:", "").strip()
+            mae = partes[1].replace("Mãe:", "").strip()
+        elif " e " in filiacao_bruta:
+            partes = filiacao_bruta.split(" e ", 1)
+            pai = partes[0].strip()
+            mae = partes[1].strip()
+        else:
+            pai = filiacao_bruta.strip()
+
+        aluno_para_html = {
+            'idAluno': aluno_db['idAluno'],
+            'nome': aluno_db['nomeCompleto'],       
+            'cpf': aluno_db.get('cpf') or "",
+            'identidade': aluno_db.get('identidade') or "",
+            'nome_pai': pai,                        
+            'nome_mae': mae,                        
+            'email': aluno_db.get('contato_email') or "",
+            'telefone': aluno_db.get('contato_tel') or "", 
+            'idTurma': aluno_db['idTurma'],
+            'nomeTurma': aluno_db.get('nomeTurma') or "Sem Turma"
+        }
+
+        return aluno_para_html
+    finally:
+        cursor.close()
+        conn.close()
+
+def atualizar_aluno(id_aluno, dados):
+    conn = get_db_connection()
+    if not conn: return False
+    try:
+        cursor = conn.cursor()
+        
+        filiacao_junta = f"Pai: {dados['nome_pai']} | Mãe: {dados['nome_mae']}"
+        
+        query_aluno = """
+            UPDATE Aluno 
+            SET nomeCompleto = %s, cpf = %s, identidade = %s, filiacao = %s
+            WHERE idAluno = %s
+        """
+        cursor.execute(query_aluno, (
+            dados['nome'], dados['cpf'], dados['identidade'], filiacao_junta, id_aluno
+        ))
+
+        cursor.execute("SELECT idContato FROM Contato WHERE idAluno = %s", (id_aluno,))
+        contato_existente = cursor.fetchone()
+
+        if contato_existente:
+            query_contato = "UPDATE Contato SET email = %s, telefone = %s WHERE idAluno = %s"
+            cursor.execute(query_contato, (dados['email'], dados['telefone'], id_aluno))
+        else:
+            query_contato = "INSERT INTO Contato (email, telefone, idAluno) VALUES (%s, %s, %s)"
+            cursor.execute(query_contato, (dados['email'], dados['telefone'], id_aluno))
+
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Erro ao atualizar: {e}")
+        conn.rollback()
+        return False
+    finally:
+        cursor.close()
+        conn.close()
+
+def deletar_aluno(id_aluno):
+    conn = get_db_connection()
+    if not conn: return False
+    try:
+        cursor = conn.cursor()
+        
+        # 1. Apagar registros vinculados
+        cursor.execute("DELETE FROM Contato WHERE idAluno = %s", (id_aluno,))
+        cursor.execute("DELETE FROM Endereco WHERE idAluno = %s", (id_aluno,))
+        cursor.execute("DELETE FROM Avaliacao WHERE idAluno = %s", (id_aluno,))
+        cursor.execute("DELETE FROM Comportamento WHERE idAluno = %s", (id_aluno,))
+        
+        # 2. Apagar Aluno
+        cursor.execute("DELETE FROM Aluno WHERE idAluno = %s", (id_aluno,))
+        
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Erro ao deletar aluno {id_aluno}: {e}")
+        conn.rollback()
+        return False
+    finally:
+        cursor.close()
+        conn.close()

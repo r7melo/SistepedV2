@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from ..services.aluno_service import criar_aluno, listar_alunos
+from ..services.aluno_service import atualizar_aluno, criar_aluno, deletar_aluno, listar_alunos, obter_aluno_por_id
 from ..services.turma_service import listar_turmas
 
 alunos_bp = Blueprint('alunos', __name__, url_prefix='/alunos')
@@ -36,3 +36,33 @@ def cadastrar_aluno():
     
     return render_template('cadastrar_aluno.html', turmas=lista_turmas)
 
+
+@alunos_bp.route('/editar_aluno/<int:id>', methods=['GET', 'POST'])
+def editar_aluno(id):
+    if request.method == 'POST':
+        dados = {
+            'nome': request.form.get('nome'),
+            'cpf': request.form.get('cpf'),
+            'identidade': request.form.get('identidade'),
+            'nome_pai': request.form.get('nome_pai'),
+            'nome_mae': request.form.get('nome_mae'),
+            'email': request.form.get('email'),
+            'telefone': request.form.get('telefone')
+        }
+        
+        if atualizar_aluno(id, dados):
+            flash('Aluno atualizado com sucesso!', 'success')
+            return redirect(url_for('alunos.index'))
+        else:
+            flash('Erro ao salvar alterações.', 'error')
+
+    aluno = obter_aluno_por_id(id)
+    return render_template('editar_aluno.html', aluno=aluno)
+
+@alunos_bp.route('/excluir_aluno/<int:id>', methods=['POST'])
+def excluir_aluno(id):
+    if deletar_aluno(id):
+        flash('Aluno removido permanentemente.', 'success')
+    else:
+        flash('Erro ao remover aluno. Verifique dependências.', 'error')
+    return redirect(url_for('alunos.index'))

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Aluno - Sisteped{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    
+    <div class="page-header">
+        <h2>Edição de Aluno</h2>
+    </div>
+
+    <div class="content-card">
+        <h3 class="section-title">Dados do aluno</h3>
+
+        <form method="POST" action="{{ url_for('alunos.editar_aluno', id=aluno.idAluno) }}">
+            
+            <div style="margin-bottom: 20px;">
+                <label class="form-label">Nome Completo</label>
+                <input type="text" name="nome" class="form-control" value="{{ aluno.nome }}" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">CPF</label>
+                    <input type="text" name="cpf" class="form-control" value="{{ aluno.cpf or '' }}" placeholder="Ex: 999.999.999-99">
+                </div>
+                <div class="form-col">
+                    <label class="form-label">Identidade</label>
+                    <input type="text" name="identidade" class="form-control" value="{{ aluno.identidade or '' }}" placeholder="Ex: 111111111-11">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">Nome do Pai</label>
+                    <input type="text" name="nome_pai" class="form-control" value="{{ aluno.nome_pai or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="form-label">Nome da Mãe</label>
+                    <input type="text" name="nome_mae" class="form-control" value="{{ aluno.nome_mae or '' }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ aluno.email or '' }}">
+                </div>
+                <div class="form-col">
+                    <label class="form-label">Telefone</label>
+                    <input type="text" name="telefone" class="form-control" value="{{ aluno.telefone or '' }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-black">Salvar Alterações</button>
+                <a href="{{ url_for('alunos.index') }}" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+
+        <div style="margin-top: 100px;">
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background-color: #fffafb; border: 1px solid #ffebeb; border-radius: 8px;">
+                <div>
+                    <strong style="color: #b91c1c;">Apagar Aluno</strong>
+                    <p style="margin: 5px 0 0; font-size: 0.85rem; color: #666;">A exclusão removerá todos os registros deste aluno permanentemente.</p>
+                </div>
+                <button type="button" class="btn-danger-text" onclick="openModal()">Apagar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Confirmar Exclusão</h3>
+        <p>Você tem certeza que deseja remover o aluno <strong>{{ aluno.nome }}</strong>?</p>
+        <p style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-top: 10px; background: #fef2f2; padding: 10px; border-radius: 8px;">
+            Esta ação não pode ser desfeita.
+        </p>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            <form action="{{ url_for('alunos.excluir_aluno', id=aluno.idAluno) }}" method="POST">
+                <button type="submit" class="btn-danger-confirm">Apagar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById('deleteModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    window.onclick = function(event) {
+        let modal = document.getElementById('deleteModal');
+        if (event.target == modal) closeModal();
+    }
+</script>
+{% endblock %}
