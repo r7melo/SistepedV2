@@ -19,7 +19,19 @@
                 <input type="text" name="nome" class="form-control" value="{{ aluno.nome }}" required>
             </div>
 
+            <div style="margin-bottom: 20px;">
+                <label class="form-label">Turma</label>
+                <select name="turma_id" class="form-control" required>
+                    {% for turma in turmas %}
+                        <option value="{{ turma.idTurma }}" {% if aluno.idTurma == turma.idTurma %}selected{% endif %}>
+                            {{ turma.nome }} ({{ turma.anoLetivo }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
             <div class="form-row">
+                
                 <div class="form-col">
                     <label class="form-label">CPF</label>
                     <input type="text" name="cpf" class="form-control" value="{{ aluno.cpf or '' }}" placeholder="Ex: 999.999.999-99">

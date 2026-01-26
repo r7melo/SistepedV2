@@ -152,11 +152,11 @@ def atualizar_aluno(id_aluno, dados):
         
         query_aluno = """
             UPDATE Aluno 
-            SET nomeCompleto = %s, cpf = %s, identidade = %s, filiacao = %s
+            SET nomeCompleto = %s, cpf = %s, identidade = %s, filiacao = %s, idTurma = %s
             WHERE idAluno = %s
         """
         cursor.execute(query_aluno, (
-            dados['nome'], dados['cpf'], dados['identidade'], filiacao_junta, id_aluno
+            dados['nome'], dados['cpf'], dados['identidade'], filiacao_junta, dados['turma_id'], id_aluno
         ))
 
         cursor.execute("SELECT idContato FROM Contato WHERE idAluno = %s", (id_aluno,))

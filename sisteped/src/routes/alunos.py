@@ -42,6 +42,7 @@ def editar_aluno(id):
     if request.method == 'POST':
         dados = {
             'nome': request.form.get('nome'),
+            'turma_id': request.form.get('turma_id'),
             'cpf': request.form.get('cpf'),
             'identidade': request.form.get('identidade'),
             'nome_pai': request.form.get('nome_pai'),
@@ -55,9 +56,10 @@ def editar_aluno(id):
             return redirect(url_for('alunos.index'))
         else:
             flash('Erro ao salvar alterações.', 'error')
-
+    
     aluno = obter_aluno_por_id(id)
-    return render_template('alunos/editar_aluno.html', aluno=aluno)
+    lista_turmas = listar_turmas(session['user_id'])
+    return render_template('alunos/editar_aluno.html', aluno=aluno, turmas=lista_turmas)
 
 @alunos_bp.route('/excluir_aluno/<int:id>', methods=['POST'])
 def excluir_aluno(id):
