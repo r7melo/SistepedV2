@@ -8,7 +8,7 @@ alunos_bp = Blueprint('alunos', __name__, url_prefix='/alunos')
 def index():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
-    lista_alunos = listar_alunos()
+    lista_alunos = listar_alunos(session['user_id'])
     
     return render_template('alunos.html', alunos=lista_alunos)
 
@@ -32,7 +32,7 @@ def cadastrar_aluno():
         else:
             flash('Erro ao cadastrar aluno. Verifique os dados.', 'error')
 
-    lista_turmas = listar_turmas()
+    lista_turmas = listar_turmas(session['user_id'])
     
     return render_template('cadastrar_aluno.html', turmas=lista_turmas)
 

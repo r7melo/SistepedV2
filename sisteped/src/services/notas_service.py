@@ -1,7 +1,7 @@
 from .db import get_db_connection
 
-def listar_notas():
-    """Busca todas as notas lançadas com o nome do aluno e turma."""
+def listar_notas(id_professor):
+    """Busca as notas apenas dos alunos pertencentes às turmas do professor logado."""
     conn = get_db_connection()
     if not conn:
         return []
@@ -13,36 +13,43 @@ def listar_notas():
                 av.idAvaliacao,
                 av.nota,
                 av.data,
-                av.conteudo, -- Usado para extrair a disciplina
+                av.conteudo,
                 al.nomeCompleto AS nome_aluno,
                 t.nome AS nome_turma
             FROM Avaliacao av
             INNER JOIN Aluno al ON av.idAluno = al.idAluno
-            LEFT JOIN Turma t ON al.idTurma = t.idTurma
+            INNER JOIN Turma t ON al.idTurma = t.idTurma
+            INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
+            WHERE pt.idProfessor = %s
             ORDER BY av.data DESC
         """
-        cursor.execute(query)
-        result = cursor.fetchall()
-        return result
+        cursor.execute(query, (id_professor,))
+        return cursor.fetchall()
     except Exception as e:
-        print(f"Erro ao listar notas gerais: {e}")
+        print(f"Erro ao listar notas: {e}")
         return []
     finally:
         if conn and conn.is_connected():
             cursor.close()
             conn.close()
 
-def listar_turmas():
-    """Retorna todas as turmas cadastradas para o select."""
+def listar_turmas(id_professor):
+    """Retorna apenas as turmas vinculadas ao professor logado."""
     conn = get_db_connection()
     if not conn:
         return []
     
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT idTurma, nome FROM Turma ORDER BY nome ASC")
-        result = cursor.fetchall()
-        return result
+        query = """
+            SELECT t.idTurma, t.nome 
+            FROM Turma t
+            INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
+            WHERE pt.idProfessor = %s
+            ORDER BY t.nome ASC
+        """
+        cursor.execute(query, (id_professor,))
+        return cursor.fetchall()
     except Exception as e:
         print(f"Erro ao listar turmas: {e}")
         return []
@@ -51,8 +58,8 @@ def listar_turmas():
             cursor.close()
             conn.close()
 
-def listar_alunos_por_turma(id_turma):
-    """Retorna alunos de uma turma específica."""
+def listar_alunos_por_turma(id_turma, id_professor):
+    """Retorna alunos de uma turma específica, validando se o professor tem acesso a ela."""
     conn = get_db_connection()
     if not conn:
         return []
@@ -60,16 +67,53 @@ def listar_alunos_por_turma(id_turma):
     try:
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT idAluno, nomeCompleto 
-            FROM Aluno 
-            WHERE idTurma = %s 
-            ORDER BY nomeCompleto ASC
+            SELECT al.idAluno, al.nomeCompleto 
+            FROM Aluno al
+            INNER JOIN ProfessorTurma pt ON al.idTurma = pt.idTurma
+            WHERE al.idTurma = %s AND pt.idProfessor = %s
+            ORDER BY al.nomeCompleto ASC
         """
-        cursor.execute(query, (id_turma,))
-        result = cursor.fetchall()
-        return result
+        cursor.execute(query, (id_turma, id_professor))
+        return cursor.fetchall()
     except Exception as e:
-        print(f"Erro ao listar alunos da turma {id_turma}: {e}")
+        print(f"Erro ao listar alunos da turma: {e}")
+        return []
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+def listar_alunos_notas(id_professor, termo_busca=None):
+    """Lista alunos e suas turmas filtrando apenas pelo que o professor gerencia."""
+    conn = get_db_connection()
+    if not conn:
+        return []
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        query = """
+            SELECT 
+                al.idAluno,
+                al.nomeCompleto,
+                t.nome AS turma
+            FROM Aluno al
+            INNER JOIN Turma t ON al.idTurma = t.idTurma
+            INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
+            WHERE pt.idProfessor = %s
+        """
+        params = [id_professor]
+        
+        if termo_busca:
+            query += " AND (al.nomeCompleto LIKE %s OR t.nome LIKE %s)"
+            termo = f"%{termo_busca}%"
+            params.extend([termo, termo])
+            
+        query += " ORDER BY al.nomeCompleto ASC"
+
+        cursor.execute(query, params)
+        return cursor.fetchall()
+    except Exception as e:
+        print(f"Erro ao listar alunos para notas: {e}")
         return []
     finally:
         if conn and conn.is_connected():

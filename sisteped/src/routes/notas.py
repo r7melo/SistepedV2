@@ -1,11 +1,15 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..services.notas_service import listar_alunos_por_turma, listar_notas, listar_turmas, salvar_avaliacao
 
 notas_bp = Blueprint('notas', __name__, url_prefix='/notas')
 
 @notas_bp.route('/', methods=['GET'])
 def index():
-    notas_brutas = listar_notas()
+
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
+    notas_brutas = listar_notas(session['user_id'])
     
     for n in notas_brutas:
         conteudo = n.get('conteudo', '')
@@ -21,7 +25,12 @@ def index():
 
 @notas_bp.route('/cadastrar_notas', methods=['GET', 'POST'])
 def cadastrar_notas():
+
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
     
+    id_professor = session['user_id']
+
     if request.method == 'POST':
         titulo = request.form.get('titulo')
         data = request.form.get('data')
@@ -31,7 +40,6 @@ def cadastrar_notas():
         notas_salvas = 0
 
         for key, value in request.form.items():
-            
             if key.startswith('nota_'):
                 if value and value.strip():
                     id_aluno = key.split('_')[1]
@@ -47,13 +55,15 @@ def cadastrar_notas():
 
         return redirect(url_for('notas.cadastrar_notas', turma=turma_id))
 
-    turmas_lista = listar_turmas()
+
+    turmas_lista = listar_turmas(id_professor)
 
     turma_selecionada = request.args.get('turma')
     alunos_lista = []
 
     if turma_selecionada:
-        alunos_lista = listar_alunos_por_turma(turma_selecionada)
+        # Busca alunos da turma validando o acesso do professor
+        alunos_lista = listar_alunos_por_turma(turma_selecionada, id_professor)
 
     return render_template('cadastrar_notas.html', 
                            turmas=turmas_lista,

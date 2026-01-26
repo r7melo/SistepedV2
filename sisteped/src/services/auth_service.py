@@ -1,6 +1,4 @@
 # src/services/auth_service.py
-import json
-from pathlib import Path
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from .db import get_db_connection
@@ -14,17 +12,14 @@ def criar_usuario(nome, email, senha):
     try:
         cursor = conn.cursor()
         
-        cursor.execute("SELECT Id FROM Users WHERE Email = %s", (email,))
+        cursor.execute("SELECT idProfessor FROM Professor WHERE email = %s", (email,))
         if cursor.fetchone():
             return False, "E-mail já cadastrado."
 
-        query_user = "INSERT INTO Users (Name, Email) VALUES (%s, %s)"
-        cursor.execute(query_user, (nome, email))
-        user_id = cursor.lastrowid
-
         senha_hash = generate_password_hash(senha) 
-        query_cred = "INSERT INTO UserCredentials (UserId, PasswordHash, Role) VALUES (%s, %s, 'User')"
-        cursor.execute(query_cred, (user_id, senha_hash))
+        
+        query = "INSERT INTO Professor (nome, email, senha) VALUES (%s, %s, %s)"
+        cursor.execute(query, (nome, email, senha_hash))
 
         conn.commit()
         return True, "Usuário cadastrado com sucesso!"
@@ -47,18 +42,15 @@ def validar_usuario(email, senha_informada):
     try:
         cursor = conn.cursor(dictionary=True)
         
-        query = """
-            SELECT u.Id, u.Name, u.Email, uc.Role, uc.PasswordHash
-            FROM Users u
-            INNER JOIN UserCredentials uc ON u.Id = uc.UserId
-            WHERE u.Email = %s
-        """
+        query = "SELECT idProfessor, nome, email, senha FROM Professor WHERE email = %s"
         cursor.execute(query, (email,))
         user = cursor.fetchone()
 
-        if user and check_password_hash(user['PasswordHash'], senha_informada):
-            return user
-        
+        if user:
+  
+            if check_password_hash(user['senha'], senha_informada):
+                return user
+            
         return None
 
     except Exception as e:

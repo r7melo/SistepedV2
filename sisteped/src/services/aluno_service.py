@@ -47,8 +47,11 @@ def criar_aluno(dados):
             cursor.close()
             conn.close()
 
-
-def listar_alunos():
+def listar_alunos(id_professor):
+    """
+    Lista apenas os alunos que pertencem a turmas 
+    vinculadas ao professor logado através da tabela ProfessorTurma.
+    """
     conn = get_db_connection()
     resultados = []
     if conn:
@@ -62,10 +65,12 @@ def listar_alunos():
                     a.cpf, 
                     t.nome AS nome_turma
                 FROM Aluno a
-                LEFT JOIN Turma t ON a.idTurma = t.idTurma
+                INNER JOIN Turma t ON a.idTurma = t.idTurma
+                INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
+                WHERE pt.idProfessor = %s
                 ORDER BY a.nomeCompleto ASC
             """
-            cursor.execute(query)
+            cursor.execute(query, (id_professor,))
             resultados = cursor.fetchall()
         except Exception as e:
             print(f"Erro ao listar alunos: {e}")

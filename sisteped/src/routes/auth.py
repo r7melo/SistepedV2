@@ -19,10 +19,8 @@ def login():
         usuario = validar_usuario(email, senha)
 
         if usuario:
-            session['user_id'] = usuario['Id']
-            session['user_name'] = usuario['Name']
-            session['user_role'] = usuario['Role']
-            
+            session['user_id'] = usuario['idProfessor']
+            session['user_name'] = usuario['nome']
             return redirect(url_for('graficos.index'))
         else:
             flash('Usuário ou senha incorretos!', 'error')

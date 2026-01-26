@@ -53,11 +53,13 @@ CREATE TABLE IF NOT EXISTS Aluno (
     naturalidade VARCHAR(100),
     nacionalidade VARCHAR(100),
     identidade VARCHAR(50),
-    cpf VARCHAR(14) UNIQUE,
+    cpf VARCHAR(14),
     idTurma INT NULL,
     CONSTRAINT FK_Aluno_Turma
         FOREIGN KEY (idTurma)
-        REFERENCES Turma(idTurma)
+        REFERENCES Turma(idTurma),
+    -- Garante que o CPF não se repita dentro da mesma turma
+    UNIQUE KEY uq_cpf_por_turma (cpf, idTurma)
 );
 
 -- ============================
