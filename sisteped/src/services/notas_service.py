@@ -42,7 +42,7 @@ def listar_turmas(id_professor):
     try:
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT t.idTurma, t.nome 
+            SELECT t.idTurma, t.nome, t.anoLetivo 
             FROM Turma t
             INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
             WHERE pt.idProfessor = %s

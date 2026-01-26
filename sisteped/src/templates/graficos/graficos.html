@@ -1,143 +1,135 @@
 {% extends "base.html" %}
 
+{% block title %}Sisteped - Dashboard{% endblock %}
+
 {% block content %}
 <div class="page-container">
-    
     <div class="page-header">
-        <h2>Gráficos de Desempenho</h2>
+        <h2>Análise de Desempenho e Clima</h2>
     </div>
 
-    <div class="dashboard-controls">
-        <div class="class-selector">
-            <span class="selector-value">CR002 - Terceiro A</span>
-            <button class="icon-btn-sm">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+    <div class="dashboard-controls-wrapper">
+        <div class="class-selector-container">
+            <label for="select-turma" class="form-label">Selecionar Turma para Análise</label>
+            <select id="select-turma" class="form-control" onchange="mudarTurma()">
+                <option value="" disabled {% if not turma_id %}selected{% endif %}>Escolha uma turma...</option>
+                {% for t in turmas %}
+                    <option value="{{ t.idTurma }}" {% if turma_id|string == t.idTurma|string %}selected{% endif %}>
+                        {{ t.nome }}{% if t.anoLetivo %} ({{ t.anoLetivo }}){% endif %}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
+    </div>
 
-        <div class="period-toggle">
-            <button class="toggle-btn">Mês</button>
-            <button class="toggle-btn">Trimestre</button>
-            <button class="toggle-btn active">Semestre</button>
+    {% if dados %}
+    <div class="dashboard-card main-timeline">
+        <div class="card-header"><h3>Evolução Temporal das Notas</h3></div>
+        <div class="chart-container" style="height: 350px;">
+            <canvas id="timelineChart"></canvas>
         </div>
     </div>
 
     <div class="dashboard-grid">
-        
-        <div class="dashboard-card main-chart-card">
-            <h3>Desempenho Geral</h3>
-            <div class="chart-container">
-                <canvas id="desempenhoChart"></canvas>
+        <div class="dashboard-card">
+            <h3>Média por Disciplina</h3>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="subjectChart"></canvas>
             </div>
         </div>
 
-        <div class="dashboard-sidebar">
-            
-            <div class="dashboard-card">
-                <h3>Alunos em Risco</h3>
-                <ul class="risk-list">
-                    <li>1234 - Francisco José Soares</li>
-                    <li>1234 - Soares Francisco José</li>
-                    <li>0963 - Maria da Silva</li>
-                </ul>
+        <div class="dashboard-card">
+            <h3>Perfil Comportamental</h3>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="behaviorRadarChart"></canvas>
             </div>
-
-            <div class="dashboard-card">
-                <h3>Desempenho vs. Último Período</h3>
-                <div class="table-responsive">
-                    <table class="clean-table compact">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th class="text-right">Mudança</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-green">+84%</td>
-                            </tr>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-red">-8%</td>
-                            </tr>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-green">+2%</td>
-                            </tr>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-green">+33%</td>
-                            </tr>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-green">+30%</td>
-                            </tr>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-green">+15%</td>
-                            </tr>
-                            <tr>
-                                <td>Francisco José Soares</td>
-                                <td class="text-right text-red">-12%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div>
     </div>
 
+    <div class="dashboard-card" style="margin-top: 25px;">
+        <h3>Distribuição de Notas da Turma</h3>
+        <div class="chart-container" style="height: 200px;">
+            <canvas id="distributionBarChart"></canvas>
+        </div>
+    </div>
+    {% else %}
+    <div class="dashboard-card" style="text-align: center; padding: 50px;">
+        <p class="text-gray">Selecione uma turma para carregar os dados reais.</p>
+    </div>
+    {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-    const ctx = document.getElementById('desempenhoChart').getContext('2d');
-    
-    // Configuração do Gráfico de Barras
-    new Chart(ctx, {
-        type: 'bar',
+    function mudarTurma() {
+        const id = document.getElementById('select-turma').value;
+        if (id) window.location.href = "{{ url_for('graficos.index') }}?turma=" + id;
+    }
+
+    {% if dados %}
+    // 1. Timeline
+    new Chart(document.getElementById('timelineChart'), {
+        type: 'line',
         data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            labels: {{ dados.timeline | map(attribute='mes') | list | tojson | safe }},
             datasets: [{
-                label: 'Média da Turma',
-                data: [0, 4, 5, 4, 3.5, 6, 0, 9.5, 6, 8, 0, 0], // Dados fictícios baseados na imagem
-                backgroundColor: '#000000', // Barras Pretas
-                borderRadius: 4, // Bordas arredondadas no topo
-                barPercentage: 0.6, // Largura da barra
+                label: 'Média',
+                data: {{ dados.timeline | map(attribute='media') | list | tojson | safe }},
+                borderColor: '#000', fill: true, tension: 0.3
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false // Esconde a legenda pois já tem título no card
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 10,
-                    grid: {
-                        color: '#f3f4f6' // Linhas de grade bem suaves
-                    },
-                    ticks: {
-                        font: { family: 'Inter' }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false // Remove grade vertical
-                    },
-                    ticks: {
-                        font: { family: 'Inter' }
-                    }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10 } } }
     });
+
+    // 2. Disciplinas
+    new Chart(document.getElementById('subjectChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ dados.disciplinas | map(attribute='disciplina') | list | tojson | safe }},
+            datasets: [{
+                data: {{ dados.disciplinas | map(attribute='media') | list | tojson | safe }},
+                backgroundColor: '#111827'
+            }]
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    // 3. Radar (Sempre com as mesmas tags e contagem correta)
+    new Chart(document.getElementById('behaviorRadarChart'), {
+        type: 'radar',
+        data: {
+            labels: {{ dados.comportamento | map(attribute='tag') | list | tojson | safe }},
+            datasets: [{
+                label: 'Ocorrências',
+                data: {{ dados.comportamento | map(attribute='total') | list | tojson | safe }},
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: '#3b82f6'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, suggestedMax: 10, ticks: { display: false } } } }
+    });
+
+    // 4. Distribuição
+    new Chart(document.getElementById('distributionBarChart'), {
+        type: 'bar',
+        data: {
+            labels: ['0-3', '3-5', '5-7', '7-9', '9-10'],
+            datasets: [{
+                data: {{ dados.distribuicao | tojson | safe }},
+                backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#059669']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    {% endif %}
 </script>
+
+<style>
+.dashboard-controls-wrapper { background: #f9fafb; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 30px; }
+.class-selector-container { max-width: 350px; }
+.dashboard-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+.dashboard-card.main-timeline { border-top: 5px solid #000; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+@media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+</style>
 {% endblock %}

@@ -7,8 +7,9 @@ Use apenas em caso de conflito de porta, nome ou ambiente quebrado.
 
 ```bash
 docker-compose down
-docker rm -f sisteped_app sisteped_mysql
 ```
+
+Para apagar o volume de dados: `-v`
 
 ---
 
@@ -19,7 +20,7 @@ Primeira execução ou mudanças estruturais.
 docker-compose up --build -d
 ```
 
-Para apagar o volume de dados: `-v`
+
 
 ---
 
