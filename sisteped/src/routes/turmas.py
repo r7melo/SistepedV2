@@ -10,7 +10,7 @@ def index():
     
     lista_de_turmas = listar_turmas(session['user_id'])
     
-    return render_template('turmas.html', turmas=lista_de_turmas)
+    return render_template('turmas/turmas.html', turmas=lista_de_turmas)
 
 
 @turmas_bp.route('/cadastrar_turma', methods=['GET', 'POST'])
@@ -28,7 +28,7 @@ def cadastrar_turma():
         else:
             flash('Erro ao criar turma.', 'error')
 
-    return render_template('cadastrar_turma.html')
+    return render_template('turmas/cadastrar_turma.html')
 
 @turmas_bp.route('/editar_turma/<int:id>', methods=['GET', 'POST'])
 def editar_turma(id):
@@ -50,7 +50,7 @@ def editar_turma(id):
     if not turma:
         return redirect(url_for('turmas.index'))
 
-    return render_template('editar_turma.html', turma=turma)
+    return render_template('turmas/editar_turma.html', turma=turma)
 
 @turmas_bp.route('/excluir/<int:id>', methods=['POST'])
 def excluir_turma(id):

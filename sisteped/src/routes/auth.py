@@ -25,7 +25,7 @@ def login():
         else:
             flash('Usuário ou senha incorretos!', 'error')
 
-    return render_template('login.html')
+    return render_template('auth/login.html')
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -44,11 +44,11 @@ def register():
 
         if sucesso:
             flash(mensagem, 'success')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth/auth.login'))
         else:
             flash(mensagem, 'error')
 
-    return render_template('register.html')
+    return render_template('auth/register.html')
 
 @auth_bp.route('/logout')
 def logout():

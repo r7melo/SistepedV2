@@ -21,7 +21,7 @@ def index():
             n['atividade'] = conteudo
             n['disciplina'] = 'Geral'
 
-    return render_template('notas.html', notas=notas_brutas)
+    return render_template('notas/notas.html', notas=notas_brutas)
 
 @notas_bp.route('/cadastrar_notas', methods=['GET', 'POST'])
 def cadastrar_notas():
@@ -65,7 +65,7 @@ def cadastrar_notas():
         # Busca alunos da turma validando o acesso do professor
         alunos_lista = listar_alunos_por_turma(turma_selecionada, id_professor)
 
-    return render_template('cadastrar_notas.html', turmas=turmas_lista, alunos=alunos_lista, turma_atual=turma_selecionada)
+    return render_template('notas/cadastrar_notas.html', turmas=turmas_lista, alunos=alunos_lista, turma_atual=turma_selecionada)
 
 
 @notas_bp.route('/atualizar_individual/<int:id>', methods=['POST'])

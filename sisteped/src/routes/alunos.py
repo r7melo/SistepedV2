@@ -10,7 +10,7 @@ def index():
     
     lista_alunos = listar_alunos(session['user_id'])
     
-    return render_template('alunos.html', alunos=lista_alunos)
+    return render_template('alunos/alunos.html', alunos=lista_alunos)
 
 @alunos_bp.route('/cadastrar_aluno', methods=['GET', 'POST'])
 def cadastrar_aluno():
@@ -34,7 +34,7 @@ def cadastrar_aluno():
 
     lista_turmas = listar_turmas(session['user_id'])
     
-    return render_template('cadastrar_aluno.html', turmas=lista_turmas)
+    return render_template('alunos/cadastrar_aluno.html', turmas=lista_turmas)
 
 
 @alunos_bp.route('/editar_aluno/<int:id>', methods=['GET', 'POST'])
@@ -57,7 +57,7 @@ def editar_aluno(id):
             flash('Erro ao salvar alterações.', 'error')
 
     aluno = obter_aluno_por_id(id)
-    return render_template('editar_aluno.html', aluno=aluno)
+    return render_template('alunos/editar_aluno.html', aluno=aluno)
 
 @alunos_bp.route('/excluir_aluno/<int:id>', methods=['POST'])
 def excluir_aluno(id):
