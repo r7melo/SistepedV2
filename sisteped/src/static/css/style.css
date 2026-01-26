@@ -858,3 +858,117 @@ body {
     background: #ef4444;
     color: white;
 }
+
+/* --- SISTEMA DE MODAIS (POPUP) --- */
+.modal-overlay {
+    display: none; /* Controlado pelo JS */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000; /* Modal de edição */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal de Confirmação fica acima do de Edição */
+.modal-overlay.danger {
+    z-index: 1100;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background: #ffffff;
+    width: 90%;
+    max-width: 450px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    animation: modalScale 0.2s ease-out;
+}
+
+.modal-content.small { max-width: 350px; }
+
+@keyframes modalScale {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* --- TABELA DE NOTAS --- */
+.student-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.student-cell span {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.grade-text {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.grade-text.positive { color: #059669; } /* Verde */
+.grade-text.negative { color: #dc2626; } /* Vermelho */
+
+.icon-btn-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 1.1rem;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.icon-btn-edit:hover { color: #000; }
+
+/* --- BOTÕES E FLEXIBILIDADE --- */
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.btn-danger {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-danger:hover { background-color: #b91c1c; }
+
+.btn-danger-outline {
+    background: transparent;
+    color: #dc2626;
+    border: 1px solid #dc2626;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger-outline:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.danger-zone {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fffafb;
+    border: 1px solid #ffebeb;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.danger-info strong { color: #b91c1c; display: block; }
+.danger-info p { font-size: 0.85rem; color: #6b7280; margin-top: 4px; }

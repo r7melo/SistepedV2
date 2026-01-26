@@ -3,15 +3,15 @@
 {% block content %}
 <div class="page-container">
     
-    <div class="page-header">
+    <header class="page-header">
         <h2>Histórico de Notas</h2>
-    </div>
+    </header>
 
     <div class="toolbar">
         <div class="toolbar-left">
             <div class="search-box">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" placeholder="Buscar aluno...">
+                <input type="text" id="inputBusca" placeholder="Buscar aluno..." onkeyup="filtrarTabela()">
             </div>
 
             <button class="btn-outline">
@@ -19,19 +19,22 @@
                 Filtrar
             </button>
 
-            <a href="{{ url_for('notas.cadastrar_notas') }}"><button class="btn-black small">Lançar Novas</button></a>
+            <a href="{{ url_for('notas.cadastrar_notas') }}">
+                <button class="btn-black small">Lançar Novas</button>
+            </a>
         </div>
     </div>
 
     <div class="table-responsive">
-        <table class="clean-table">
+        <table class="clean-table" id="tabelaNotas">
             <thead>
                 <tr>
                     <th style="width: 35%;">Aluno</th>
                     <th>Turma</th>
                     <th>Disciplina</th>
-                    <th>Nota</th> <th class="text-gray">Data</th>
-                    <th></th>
+                    <th>Nota</th> 
+                    <th class="text-gray">Data</th>
+                    <th class="text-right">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,31 +42,30 @@
                     {% for nota in notas %}
                     <tr>
                         <td>
-                            <div style="display: flex; flex-direction: column;">
-                                <strong style="font-size: 0.95rem;">{{ nota.nome_aluno }}</strong>
-                                <span style="font-size: 0.8rem; color: #666;">{{ nota.atividade }}</span>
+                            <div class="student-cell">
+                                <strong>{{ nota.nome_aluno }}</strong>
+                                <span>{{ nota.atividade }}</span>
                             </div>
                         </td>
-                        
                         <td><span class="badge">{{ nota.nome_turma }}</span></td>
-                        <td><span class="badge" style="background: #f3f4f6; color: #374151;">{{ nota.disciplina }}</span></td>
-                        
+                        <td><span class="badge secondary">{{ nota.disciplina }}</span></td>
                         <td>
-                            <strong style="color: {% if nota.nota >= 6 %}#059669{% else %}#dc2626{% endif %};">
-                                {{ nota.nota }}
+                            <strong class="grade-text {{ 'positive' if nota.nota|float >= 6 else 'negative' }}">
+                                {{ "%.2f"|format(nota.nota|float) }}
                             </strong>
                         </td>
-
                         <td class="text-gray">{{ nota.data.strftime('%d/%m/%Y') if nota.data else '-' }}</td>
-                        
                         <td class="text-right">
-                            <button class="icon-btn-sm">•••</button>
+                            <button class="icon-btn-edit" title="Editar" 
+                                    onclick="abrirModalEdicao('{{ nota.idAvaliacao }}', '{{ nota.nome_aluno }}', '{{ nota.nota }}')">
+                                &#9998;
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="6" style="text-align:center; padding: 40px; color: #666;">
+                        <td colspan="6" class="text-center text-gray" style="padding: 40px;">
                             Nenhuma nota lançada no sistema.
                         </td>
                     </tr>
@@ -71,6 +73,85 @@
             </tbody>
         </table>
     </div>
-
 </div>
+
+<div id="modalNota" class="modal-overlay">
+    <div class="modal-content">
+        <header style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <h3 class="section-title" style="margin:0">Editar Registro</h3>
+            <button onclick="fecharModal()" style="background:none; border:none; font-size:20px; cursor:pointer">&times;</button>
+        </header>
+
+        <form id="formEditarNota" method="POST">
+            <div class="modal-body">
+                <p class="subtitle">Aluno: <strong id="nomeAlunoModal"></strong></p>
+                <div class="form-group" style="margin-top:15px">
+                    <label class="form-label">Nota</label>
+                    <input type="number" name="nova_nota" id="inputNotaModal" step="0.1" min="0" max="10" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn-black flex-2">Salvar Alteração</button>
+                <button type="button" id="btnExcluirNota" class="btn-danger-outline flex-1">Apagar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalConfirmacao" class="modal-overlay danger">
+    <div class="modal-content small">
+        <h3 class="text-red">Tem certeza?</h3>
+        <p class="text-gray" style="margin: 15px 0">Esta nota será removida permanentemente do banco de dados.</p>
+        <div class="modal-footer" style="justify-content: center">
+            <button onclick="fecharConfirmacao()" class="btn-secondary">Cancelar</button>
+            <button id="btnConfirmarExclusaoFinal" class="btn-danger-confirm">Sim, Apagar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let idNotaAtual = null;
+
+    function abrirModalEdicao(id, nome, nota) {
+        idNotaAtual = id;
+        document.getElementById('nomeAlunoModal').innerText = nome;
+        document.getElementById('inputNotaModal').value = parseFloat(nota).toFixed(1);
+        document.getElementById('formEditarNota').action = "/notas/atualizar_individual/" + id;
+        document.getElementById('modalNota').style.display = 'flex';
+    }
+
+    function fecharModal() { document.getElementById('modalNota').style.display = 'none'; }
+
+    function abrirConfirmacao() {
+        document.getElementById('modalConfirmacao').style.display = 'flex';
+        document.getElementById('btnConfirmarExclusaoFinal').onclick = function() {
+            window.location.href = "/notas/excluir_individual/" + idNotaAtual;
+        };
+    }
+
+    function fecharConfirmacao() { document.getElementById('modalConfirmacao').style.display = 'none'; }
+
+    document.getElementById('btnExcluirNota').onclick = (e) => {
+        e.preventDefault();
+        abrirConfirmacao();
+    };
+
+    window.onclick = (event) => {
+        if (event.target == document.getElementById('modalNota')) fecharModal();
+        if (event.target == document.getElementById('modalConfirmacao')) fecharConfirmacao();
+    }
+
+    // Função de busca simples para o campo de pesquisa
+    function filtrarTabela() {
+        let input = document.getElementById("inputBusca").value.toUpperCase();
+        let tr = document.getElementById("tabelaNotas").getElementsByTagName("tr");
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                let txtValue = td.textContent || td.innerText;
+                tr[i].style.display = txtValue.toUpperCase().indexOf(input) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>
 {% endblock %}

@@ -145,42 +145,35 @@ def salvar_avaliacao(titulo, disciplina, data, id_aluno, nota):
         if conn and conn.is_connected():
             cursor.close()
             conn.close()
-    """
-    Lista simplificada de alunos (ID, Nome e Turma) para a tela de lançamento de notas.
-    """
+
+def atualizar_nota_individual(id_av, nota):
     conn = get_db_connection()
-    if not conn:
-        return []
-
+    if not conn: return False
     try:
-        cursor = conn.cursor(dictionary=True)
-        
-        # Query simplificada: Apenas dados essenciais para identificação
-        query = """
-            SELECT 
-                al.idAluno,
-                al.nomeCompleto,
-                t.nome AS turma
-            FROM Aluno al
-            LEFT JOIN Turma t ON al.idTurma = t.idTurma
-        """
-        
-        params = []
-        if termo_busca:
-            query += " WHERE al.nomeCompleto LIKE %s OR t.nome LIKE %s"
-            termo = f"%{termo_busca}%"
-            params = [termo, termo]
-            
-        query += " ORDER BY al.nomeCompleto ASC"
-
-        cursor.execute(query, params)
-        alunos = cursor.fetchall()
-        return alunos
-
+        cursor = conn.cursor()
+        query = "UPDATE Avaliacao SET nota = %s WHERE idAvaliacao = %s"
+        cursor.execute(query, (nota, id_av))
+        conn.commit()
+        return True
     except Exception as e:
-        print(f"Erro ao listar alunos para notas: {e}")
-        return []
+        print(f"Erro no banco: {e}")
+        return False
     finally:
-        if conn and conn.is_connected():
-            cursor.close()
-            conn.close()
+        cursor.close()
+        conn.close()
+
+def remover_nota_individual(id_av):
+    conn = get_db_connection()
+    if not conn: return False
+    try:
+        cursor = conn.cursor()
+        query = "DELETE FROM Avaliacao WHERE idAvaliacao = %s"
+        cursor.execute(query, (id_av,))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Erro ao remover: {e}")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
