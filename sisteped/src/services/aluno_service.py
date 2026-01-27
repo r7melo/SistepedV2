@@ -47,33 +47,35 @@ def criar_aluno(dados):
             cursor.close()
             conn.close()
 
-def listar_alunos(id_professor):
-    """
-    Lista apenas os alunos que pertencem a turmas 
-    vinculadas ao professor logado através da tabela ProfessorTurma.
-    """
+def listar_alunos(id_professor, termo_busca=None, id_turma=None):
     conn = get_db_connection()
     resultados = []
     if conn:
         try:
             cursor = conn.cursor(dictionary=True)
- 
+            # Base da Query
             query = """
-                SELECT 
-                    a.idAluno, 
-                    a.nomeCompleto, 
-                    a.cpf, 
-                    t.nome AS nome_turma
+                SELECT a.idAluno, a.nomeCompleto, a.cpf, t.nome AS nome_turma, t.idTurma
                 FROM Aluno a
                 INNER JOIN Turma t ON a.idTurma = t.idTurma
                 INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
                 WHERE pt.idProfessor = %s
-                ORDER BY a.nomeCompleto ASC
             """
-            cursor.execute(query, (id_professor,))
+            params = [id_professor]
+
+            # Filtro por Nome
+            if termo_busca:
+                query += " AND a.nomeCompleto LIKE %s"
+                params.append(f"%{termo_busca}%")
+
+            # Filtro por Turma
+            if id_turma and id_turma != 'todos':
+                query += " AND t.idTurma = %s"
+                params.append(id_turma)
+
+            query += " ORDER BY a.nomeCompleto ASC"
+            cursor.execute(query, tuple(params))
             resultados = cursor.fetchall()
-        except Exception as e:
-            print(f"Erro ao listar alunos: {e}")
         finally:
             cursor.close()
             conn.close()

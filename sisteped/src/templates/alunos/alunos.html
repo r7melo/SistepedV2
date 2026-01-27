@@ -10,25 +10,43 @@
     </div>
 
     <div class="toolbar">
-        <div class="toolbar-left">
-            <div class="search-box">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" placeholder="Buscar por nome..." onkeyup="filtrarTabela()" id="inputBusca">
+        <form action="{{ url_for('alunos.index') }}" method="GET" style="display: flex; width: 100%; gap: 12px; align-items: center;">
+            <div class="toolbar-left" style="display: flex; flex: 1; gap: 12px;">
+                
+                <div class="search-box" style="position: relative; display: flex; align-items: center;">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    
+                    <input type="text" name="busca" placeholder="Buscar por nome..." value="{{ busca_atual or '' }}" id="inputBusca" style="padding-right: 30px;">
+
+                    {% if busca_atual %}
+                    <a href="{{ url_for('alunos.index', turma_id=turma_atual) }}" class="clear-search" title="Limpar busca" style="position: absolute; right: 10px; color: #9ca3af; text-decoration: none; font-size: 18px; line-height: 1;">
+                        &times;
+                    </a>
+                    {% endif %}
+                </div>
+
+                <select name="turma_id" class="form-control" style="width: 200px; height: 38px;" onchange="this.form.submit()">
+                    <option value="todos" {% if turma_atual == 'todos' %}selected{% endif %}>Todas as Turmas</option>
+                    {% for t in turmas %}
+                        <option value="{{ t.idTurma }}" {% if turma_atual|string == t.idTurma|string %}selected{% endif %}>
+                            {{ t.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <a href="{{ url_for('alunos.cadastrar_aluno') }}">
+                    <button type="button" class="btn-black small">Cadastrar</button>
+                </a>
+
+                <button type="button" class="btn-black small" style="background-color: #16a34a; border: none;" onclick="openImportModal()">
+                    Importar CSV
+                </button>
             </div>
-
-            <button class="btn-outline">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                Filtrar
-            </button>
-
-            <a href="{{ url_for('alunos.cadastrar_aluno') }}">
-                <button class="btn-black small">Cadastrar</button>
-            </a>
-
-            <button type="button" class="btn-black small" style="background-color: #16a34a; border: none;" onclick="openImportModal()">
-                Importar CSV
-            </button>
-        </div>
+        </form>
     </div>
 
     <div class="table-responsive">

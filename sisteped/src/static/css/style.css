@@ -972,3 +972,20 @@ body {
 
 .danger-info strong { color: #b91c1c; display: block; }
 .danger-info p { font-size: 0.85rem; color: #6b7280; margin-top: 4px; }
+
+/* No seu arquivo de estilos */
+.clear-search {
+    cursor: pointer;
+    transition: color 0.2s;
+    font-weight: bold;
+}
+
+.clear-search:hover {
+    color: #000 !important;
+}
+
+.search-box input {
+    width: 100%;
+    /* Garante que o texto não fique embaixo do X */
+    padding-right: 30px !important; 
+}

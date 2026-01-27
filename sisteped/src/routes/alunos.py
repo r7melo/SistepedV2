@@ -10,10 +10,18 @@ alunos_bp = Blueprint('alunos', __name__, url_prefix='/alunos')
 def index():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
-    lista_alunos = listar_alunos(session['user_id'])
+    # Captura os filtros da URL (GET)
+    busca = request.args.get('busca', '')
+    turma_filtrada = request.args.get('turma_id', 'todos')
+
+    lista_alunos = listar_alunos(session['user_id'], termo_busca=busca, id_turma=turma_filtrada)
     lista_turmas = listar_turmas(session['user_id'])
 
-    return render_template('alunos/alunos.html', alunos=lista_alunos, turmas=lista_turmas)
+    return render_template('alunos/alunos.html', 
+                           alunos=lista_alunos, 
+                           turmas=lista_turmas,
+                           busca_atual=busca, 
+                           turma_atual=turma_filtrada)
 
 @alunos_bp.route('/cadastrar_aluno', methods=['GET', 'POST'])
 def cadastrar_aluno():
@@ -86,7 +94,10 @@ def importar_csv():
         
         total = cadastrar_alunos_em_lote(list(leitor), id_turma)
         
-        flash(f'Importação concluída: {total} alunos cadastrados!', 'success')
+        if total > 0:
+            flash(f'Importação concluída: {total} alunos cadastrados!', 'success')
+        else:
+            flash('Nenhum aluno foi cadastrado. Verifique o arquivo.', 'error')
     else:
         flash('Arquivo inválido. Use o modelo .csv disponível no modal.', 'error')
         
