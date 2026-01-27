@@ -1,6 +1,6 @@
 import csv
 import io
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from ..services.aluno_service import atualizar_aluno, cadastrar_alunos_em_lote, criar_aluno, deletar_aluno, listar_alunos, obter_aluno_por_id
 from ..services.turma_service import listar_turmas
 
@@ -115,3 +115,15 @@ def importar_csv():
         flash('Arquivo inválido. Use o modelo .csv disponível no modal.', 'error')
         
     return redirect(url_for('alunos.index'))
+
+
+@alunos_bp.route('/api/filtrar_por_turma/<int:turma_id>')
+def api_alunos_por_turma(turma_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    # Você pode criar uma função simples no service para isso
+    from ..services.notas_service import listar_alunos_por_turma
+    alunos = listar_alunos_por_turma(turma_id, session['user_id']) #
+    
+    return jsonify(alunos)

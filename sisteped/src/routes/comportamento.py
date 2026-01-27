@@ -1,3 +1,4 @@
+import math
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from src.routes import turmas
 from src.services.comportamento_service import excluir_comportamento_seguro, listar_comportamentos_professor, listar_tags_distintas_professor, salvar_comportamento
@@ -10,21 +11,25 @@ comportamento_bp = Blueprint('comportamento', __name__, url_prefix='/comportamen
 def index():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
+    pagina = request.args.get('pagina', 1, type=int)
     busca = request.args.get('busca', '')
     tag = request.args.get('tag', 'todas')
-
     id_prof = session['user_id']
-    comportamentos = listar_comportamentos_professor(id_prof, busca, tag)
+    limite = 10
+
+    comportamentos, total_geral = listar_comportamentos_professor(session['user_id'], busca, tag, pagina, limite)
+    total_paginas = math.ceil(total_geral / limite)
+    
     turmas = listar_turmas(id_prof)
     tags_existentes = listar_tags_distintas_professor(id_prof)
-    alunos = listar_alunos(id_prof)
     
     return render_template('comportamento/comportamento.html', 
                            comportamentos=comportamentos, 
                            tags_existentes=tags_existentes,
-                           alunos=alunos,
                            busca_atual=busca,
                            turmas=turmas,
+                           total_paginas=total_paginas,
+                           pagina_atual=pagina,
                            tag_atual=tag)
 
 @comportamento_bp.route('/cadastrar', methods=['POST'])

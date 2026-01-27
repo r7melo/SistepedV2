@@ -1,13 +1,17 @@
 from .db import get_db_connection
 
-def listar_comportamentos_professor(id_professor, busca='', tag='todas'):
-    """Lista os registros de comportamento vinculados ao professor logado com filtros."""
+def listar_comportamentos_professor(id_professor, busca='', tag='todas', pagina=1, limite=10):
+    """Lista os registros de comportamento com paginação e filtros."""
     conn = get_db_connection()
-    if not conn: return []
+    if not conn: return [], 0
+    
     try:
         cursor = conn.cursor(dictionary=True)
         
-        # Base da Query
+        # 1. Calcular o deslocamento (offset)
+        offset = (pagina - 1) * limite
+        
+        # 2. Base da Query de Dados
         query = """
             SELECT c.idComportamento, c.tag, c.observacao, a.nomeCompleto as nome_aluno
             FROM Comportamento c
@@ -16,28 +20,39 @@ def listar_comportamentos_professor(id_professor, busca='', tag='todas'):
         """
         params = [id_professor]
 
-        # Filtro por Nome do Aluno
         if busca:
             query += " AND a.nomeCompleto LIKE %s"
             params.append(f"%{busca}%")
 
-        # Filtro por Tag (Tipo de Comportamento)
-        # Só adiciona o filtro se for diferente de 'todas' ou 'None'
         if tag and tag != 'todas' and tag != 'None':
             query += " AND c.tag = %s"
             params.append(tag)
 
-        query += " ORDER BY a.nomeCompleto ASC"
+        # Query para pegar o TOTAL de registros sem o limite (para a paginação)
+        query_total = f"SELECT COUNT(*) as total FROM ({query}) as sub"
         
-        cursor.execute(query, tuple(params))
-        return cursor.fetchall()
+        # Adicionar ordenação e limites à query de dados
+        query += " ORDER BY a.nomeCompleto ASC LIMIT %s OFFSET %s"
+        params_dados = params + [limite, offset]
+        
+        # Executar busca do total
+        cursor.execute(query_total, tuple(params))
+        total_registros = cursor.fetchone()['total']
+        
+        # Executar busca dos dados paginados
+        cursor.execute(query, tuple(params_dados))
+        registros = cursor.fetchall()
+        
+        return registros, total_registros
+
     except Exception as e:
         print(f"Erro ao listar comportamentos: {e}")
-        return []
+        return [], 0
     finally:
         if conn and conn.is_connected():
             cursor.close()
             conn.close()
+
 
 def listar_tags_distintas_professor(id_professor):
     """Busca as tags únicas do professor para preencher o Boxlist."""

@@ -75,6 +75,36 @@
             </tbody>
         </table>
     </div>
+
+    {% if total_paginas > 1 %}
+        <div class="pagination-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e5e7eb;">
+            
+            <div class="pagination-info" style="color: #6b7280; font-size: 0.9rem;">
+                Página <strong>{{ pagina_atual }}</strong> de {{ total_paginas }}
+            </div>
+
+            <div class="pagination-nav" style="display: flex; gap: 8px;">
+                {% if pagina_atual > 1 %}
+                    <a href="{{ url_for('comportamento.index', pagina=pagina_atual-1, busca=busca_atual, tag=tag_atual) }}" class="btn-pagination">Anterior</a>
+                {% endif %}
+
+                {% for p in range(1, total_paginas + 1) %}
+                    {% if p == pagina_atual %}
+                        <span class="btn-pagination active">{{ p }}</span>
+                    {% elif p <= 3 or p > total_paginas - 2 or (p >= pagina_atual - 1 and p <= pagina_atual + 1) %}
+                        <a href="{{ url_for('comportamento.index', pagina=p, busca=busca_atual, tag=tag_atual) }}" class="btn-pagination">{{ p }}</a>
+                    {% elif p == 4 or p == total_paginas - 2 %}
+                        <span style="color: #9ca3af;">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagina_atual < total_paginas %}
+                    <a href="{{ url_for('comportamento.index', pagina=pagina_atual+1, busca=busca_atual, tag=tag_atual) }}" class="btn-pagination">Próxima</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
 </div>
 
 <div id="addModal" class="modal-overlay">
@@ -99,11 +129,6 @@
                 <label class="form-label">2. Aluno</label>
                 <select name="id_aluno" id="selectAlunoModal" class="form-control" required disabled>
                     <option value="" disabled selected>Selecione a turma primeiro...</option>
-                    {% for a in alunos %} 
-                        <option value="{{ a.idAluno }}" data-turma="{{ a.idTurma }}" style="display: none;">
-                            {{ a.nomeCompleto }}
-                        </option> 
-                    {% endfor %}
                 </select>
             </div>
 
@@ -153,31 +178,52 @@
     </div>
 </div>
 
+<style>
+.btn-pagination {
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-pagination:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.btn-pagination.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+</style>
+
 <script>
 
-    function filtrarAlunosPorTurma() {
+    async function filtrarAlunosPorTurma() {
         const turmaId = document.getElementById('selectTurmaModal').value;
         const selectAluno = document.getElementById('selectAlunoModal');
-        const optionsAlunos = selectAluno.options;
 
+        if (!turmaId) return;
+
+        // Faz a chamada para a nossa nova API
+        const response = await fetch(`/alunos/api/filtrar_por_turma/${turmaId}`);
+        const alunos = await response.json();
+
+        // Limpa e popula o select
+        selectAluno.innerHTML = '<option value="" disabled selected>Selecione o aluno...</option>';
+        alunos.forEach(aluno => {
+            const option = document.createElement('option');
+            option.value = aluno.idAluno;
+            option.text = aluno.nomeCompleto;
+            selectAluno.appendChild(option);
+        });
+        
         selectAluno.disabled = false;
-        selectAluno.value = ""; 
-
-        let encontrouAlunos = false;
-
-        for (let i = 1; i < optionsAlunos.length; i++) {
-            const idTurmaAluno = optionsAlunos[i].getAttribute('data-turma');
-            
-            if (idTurmaAluno === turmaId) {
-                optionsAlunos[i].style.display = 'block';
-                encontrouAlunos = true;
-            } else {
-                optionsAlunos[i].style.display = 'none';
-            }
-        }
-
-
-        optionsAlunos[0].innerText = encontrouAlunos ? "Selecione o aluno..." : "Nenhum aluno nesta turma";
     }
     
     // Lógica de Alternância entre Select e Input
