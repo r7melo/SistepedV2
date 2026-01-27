@@ -1,82 +1,89 @@
 from .db import get_db_connection
 
-def buscar_dados_dashboard(id_turma):
+def obter_resumo_comportamento(id_turma):
+    """Conta a frequência de cada tag de comportamento para a turma."""
     conn = get_db_connection()
-    if not conn: return None
-    
+    if not conn: return []
     try:
         cursor = conn.cursor(dictionary=True)
-        
-        # 1. Evolução Temporal (Média por Mês)
-        query_timeline = """
-            SELECT MONTH(av.data) as mes_num, MONTHNAME(av.data) as mes, AVG(av.nota) as media 
-            FROM Avaliacao av
-            JOIN Aluno al ON av.idAluno = al.idAluno
-            WHERE al.idTurma = %s 
-            GROUP BY mes_num, mes ORDER BY mes_num
+        query = """
+            SELECT c.tag, COUNT(c.idComportamento) as total
+            FROM Comportamento c
+            INNER JOIN Aluno a ON c.idAluno = a.idAluno
+            WHERE a.idTurma = %s
+            GROUP BY c.tag
         """
-        cursor.execute(query_timeline, (id_turma,))
-        timeline = cursor.fetchall()
+        cursor.execute(query, (id_turma,))
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        conn.close()
 
-        # 2. Média por Disciplina
-        query_disciplinas = """
+def obter_timeline_notas(id_turma):
+    """Calcula a média mensal das notas da turma para o gráfico de linha."""
+    conn = get_db_connection()
+    if not conn: return []
+    try:
+        cursor = conn.cursor(dictionary=True)
+        query = """
             SELECT 
-                CASE 
-                    WHEN conteudo LIKE '%(%)%' THEN SUBSTRING_INDEX(SUBSTRING_INDEX(conteudo, '(', -1), ')', 1)
-                    ELSE 'Geral'
-                END as disciplina, 
-                AVG(nota) as media
+                DATE_FORMAT(av.data, '%b') as mes,
+                AVG(av.nota) as media
             FROM Avaliacao av
-            JOIN Aluno al ON av.idAluno = al.idAluno
-            WHERE al.idTurma = %s
+            INNER JOIN Aluno a ON av.idAluno = a.idAluno
+            WHERE a.idTurma = %s
+            GROUP BY MONTH(av.data), mes
+            ORDER BY MONTH(av.data)
+        """
+        cursor.execute(query, (id_turma,))
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        conn.close()
+
+def obter_medias_disciplinas(id_turma):
+    """Calcula a média por disciplina (extraída do conteúdo entre parênteses)."""
+    conn = get_db_connection()
+    if not conn: return []
+    try:
+        cursor = conn.cursor(dictionary=True)
+        # Lógica SQL para extrair o que está entre '(' e ')' no campo conteudo
+        query = """
+            SELECT 
+                SUBSTRING_INDEX(SUBSTRING_INDEX(av.conteudo, '(', -1), ')', 1) as disciplina,
+                AVG(av.nota) as media
+            FROM Avaliacao av
+            INNER JOIN Aluno a ON av.idAluno = a.idAluno
+            WHERE a.idTurma = %s
             GROUP BY disciplina
         """
-        cursor.execute(query_disciplinas, (id_turma,))
-        disciplinas = cursor.fetchall()
+        cursor.execute(query, (id_turma,))
+        return cursor.fetchall()
+    finally:
+        cursor.close()
+        conn.close()
 
-        # 3. Perfil Comportamental (Contagem Garantida de 10 Pontos)
-        tags_fixas = [
-            'Participação', 'Foco', 'Colaboração', 'Pontualidade', 'Autonomia', 
-            'Respeito', 'Iniciativa', 'Organização', 'Interesse', 'Comunicação'
-        ]
-        
-        query_comp = """
-            SELECT tag, COUNT(*) as total 
-            FROM Comportamento 
-            WHERE idAluno IN (SELECT idAluno FROM Aluno WHERE idTurma = %s)
-            GROUP BY tag
+def obter_distribuicao_notas(id_turma):
+    """Conta quantos alunos estão em cada faixa de nota para o gráfico de barras."""
+    conn = get_db_connection()
+    if not conn: return [0, 0, 0, 0, 0]
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                SUM(CASE WHEN nota < 3 THEN 1 ELSE 0 END) as '0-3',
+                SUM(CASE WHEN nota >= 3 AND nota < 5 THEN 1 ELSE 0 END) as '3-5',
+                SUM(CASE WHEN nota >= 5 AND nota < 7 THEN 1 ELSE 0 END) as '5-7',
+                SUM(CASE WHEN nota >= 7 AND nota < 9 THEN 1 ELSE 0 END) as '7-9',
+                SUM(CASE WHEN nota >= 9 THEN 1 ELSE 0 END) as '9-10'
+            FROM Avaliacao av
+            INNER JOIN Aluno a ON av.idAluno = a.idAluno
+            WHERE a.idTurma = %s
         """
-        cursor.execute(query_comp, (id_turma,))
-        resultados_comp = {row['tag']: row['total'] for row in cursor.fetchall()}
-
-        # Montamos a lista final garantindo a ordem e os zeros
-        comportamento_final = []
-        for tag in tags_fixas:
-            comportamento_final.append({
-                'tag': tag,
-                'total': resultados_comp.get(tag, 0)
-            })
-
-        # 4. Distribuição de Notas (Histograma)
-        cursor.execute("SELECT nota FROM Avaliacao av JOIN Aluno al ON av.idAluno = al.idAluno WHERE al.idTurma = %s", (id_turma,))
-        notas = [float(row['nota']) for row in cursor.fetchall()]
-        dist = [0, 0, 0, 0, 0]
-        for n in notas:
-            if n < 3: dist[0]+=1
-            elif n < 5: dist[1]+=1
-            elif n < 7: dist[2]+=1
-            elif n < 9: dist[3]+=1
-            else: dist[4]+=1
-
-        return {
-            "timeline": timeline,
-            "disciplinas": disciplinas,
-            "comportamento": comportamento_final,
-            "distribuicao": dist
-        }
-    except Exception as e:
-        print(f"Erro no Dashboard: {e}")
-        return None
+        cursor.execute(query, (id_turma,))
+        resultado = cursor.fetchone()
+        # Converte None para 0 caso não haja notas
+        return [int(x) if x else 0 for x in resultado]
     finally:
         cursor.close()
         conn.close()
