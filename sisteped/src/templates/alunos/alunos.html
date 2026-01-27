@@ -10,11 +10,10 @@
     </div>
 
     <div class="toolbar">
-        
         <div class="toolbar-left">
             <div class="search-box">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" placeholder="Buscar por nome ou matrícula..." disabled>
+                <input type="text" placeholder="Buscar por nome..." onkeyup="filtrarTabela()" id="inputBusca">
             </div>
 
             <button class="btn-outline">
@@ -25,12 +24,15 @@
             <a href="{{ url_for('alunos.cadastrar_aluno') }}">
                 <button class="btn-black small">Cadastrar</button>
             </a>
-        </div>
 
+            <button type="button" class="btn-black small" style="background-color: #16a34a; border: none;" onclick="openImportModal()">
+                Importar CSV
+            </button>
+        </div>
     </div>
 
     <div class="table-responsive">
-        <table class="clean-table">
+        <table class="clean-table" id="tabelaAlunos">
             <thead>
                 <tr>
                     <th>Matrícula</th>
@@ -45,35 +47,103 @@
                 <tr>
                     <td class="text-gray">{{ aluno.idAluno }}</td>
                     <td><strong>{{ aluno.nomeCompleto }}</strong></td>
-                    
                     <td class="text-center">
                         {% if aluno.nome_turma %}
                             <span class="badge">{{ aluno.nome_turma }}</span>
                         {% else %}
-                            <span class="text-gray" style="font-size: 0.8rem;">—</span>
+                            <span class="text-gray">—</span>
                         {% endif %}
                     </td>
-                    
                     <td class="text-center">
                         <span class="badge" style="background: #fdf2f8; color: #db2777;">Pendente</span>
                     </td>
-                    
                     <td class="text-right">
-                        <a href="{{ url_for('alunos.editar_aluno', id=aluno.idAluno) }}" class="icon-btn-sm" title="Editar">
-                            &#9998;
-                        </a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="5" class="text-center" style="padding: 40px; color: #6b7280;">
-                        Nenhum aluno cadastrado.
+                        <a href="{{ url_for('alunos.editar_aluno', id=aluno.idAluno) }}" class="icon-btn-sm">&#9998;</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 </div>
+
+<div id="importModal" class="modal-overlay">
+    <div class="modal-content">
+        <header style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <h3 class="section-title" style="margin:0">Importar Alunos</h3>
+            <button onclick="closeImportModal()" style="background:none; border:none; font-size:24px; cursor:pointer">&times;</button>
+        </header>
+
+        <form id="formImportCSV" method="POST" action="{{ url_for('alunos.importar_csv') }}" enctype="multipart/form-data">
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label">Destinar à Turma:</label>
+                <select name="turma_id" id="turmaImport" class="form-control" required onchange="validarCampos()">
+                    <option value="" disabled selected>Escolha a turma de destino...</option>
+                    {% for turma in turmas %}
+                        <option value="{{ turma.idTurma }}">{{ turma.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 5px;">
+                <label class="form-label">Arquivo CSV:</label>
+                <input type="file" id="csvFile" name="file" accept=".csv" class="form-control" onchange="validarCampos()">
+            </div>
+
+            <div style="margin-bottom: 25px; padding-left: 2px;">
+                <a href="javascript:void(0)" onclick="downloadModeloCSV()" style="font-size: 0.8rem; color: #6b7280; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Baixar modelo de planilha (.csv)
+                </a>
+            </div>
+
+            <div class="modal-footer" style="display: flex; gap: 10px;">
+                <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeImportModal()">Cancelar</button>
+                <button type="submit" id="btnSubmitCSV" class="btn-black" style="background-color: #16a34a; flex: 2;" disabled>
+                    Finalizar Cadastro
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    // Função para gerar o CSV modelo para download
+    function downloadModeloCSV() {
+        
+        const headers = "nome_completo,cpf,identidade,nome_pai,nome_mae,email,telefone\n";
+        const placeholder = "Francisco da Silva,000.000.000-00,0000000, Antonio José, Maria de Jesus, franciscosilva@email.com,(99) 99999-9999";  
+
+        const csvContent = "data:text/csv;charset=utf-8," + headers + placeholder;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "modelo_importar_alunos_sisteped.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function validarCampos() {
+        const turma = document.getElementById('turmaImport').value;
+        const file = document.getElementById('csvFile').files.length;
+        const btn = document.getElementById('btnSubmitCSV');
+        btn.disabled = !(turma && file);
+    }
+
+    function openImportModal() {
+        document.getElementById('importModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImportModal() {
+        document.getElementById('importModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('formImportCSV').reset();
+        validarCampos();
+    }
+</script>
+
 {% endblock %}

@@ -203,3 +203,22 @@ def deletar_aluno(id_aluno):
     finally:
         cursor.close()
         conn.close()
+
+
+def cadastrar_alunos_em_lote(lista_csv, id_turma):
+    """Percorre a lista do CSV e chama a sua função criar_aluno para cada um."""
+    sucessos = 0
+    for linha in lista_csv:
+        dados_aluno = {
+            'nome': linha.get('nome_completo'),
+            'cpf': linha.get('cpf'),
+            'identidade': linha.get('identidade'),
+            'nome_pai': linha.get('nome_pai'),
+            'nome_mae': linha.get('nome_mae'),
+            'email': linha.get('email'),
+            'telefone': linha.get('telefone'),
+            'turma_id': id_turma
+        }
+        if criar_aluno(dados_aluno):
+            sucessos += 1
+    return sucessos
