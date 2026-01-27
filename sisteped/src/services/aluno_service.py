@@ -47,15 +47,40 @@ def criar_aluno(dados):
             cursor.close()
             conn.close()
 
-def listar_alunos(id_professor, termo_busca=None, id_turma=None):
+def listar_alunos(id_professor, termo_busca=None, id_turma=None, pagina=1, limite=10):
     conn = get_db_connection()
     resultados = []
+    total_registros = 0
+    
     if conn:
         try:
             cursor = conn.cursor(dictionary=True)
-            # Base da Query
+            offset = (pagina - 1) * limite
+
+            # --- 1. QUERY PARA CONTAR O TOTAL (sem limite) ---
+            query_count = """
+                SELECT COUNT(DISTINCT a.idAluno) as total
+                FROM Aluno a
+                INNER JOIN Turma t ON a.idTurma = t.idTurma
+                INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
+                WHERE pt.idProfessor = %s
+            """
+            params_count = [id_professor]
+
+            if termo_busca:
+                query_count += " AND a.nomeCompleto LIKE %s"
+                params_count.append(f"%{termo_busca}%")
+
+            if id_turma and id_turma != 'todos' and id_turma != 'None':
+                query_count += " AND t.idTurma = %s"
+                params_count.append(id_turma)
+
+            cursor.execute(query_count, tuple(params_count))
+            total_registros = cursor.fetchone()['total']
+
+            # --- 2. QUERY PRINCIPAL (com LIMIT e OFFSET) ---
             query = """
-                SELECT a.idAluno, a.nomeCompleto, a.cpf, t.nome AS nome_turma, t.idTurma
+                SELECT DISTINCT a.idAluno, a.nomeCompleto, a.cpf, t.nome AS nome_turma, t.idTurma
                 FROM Aluno a
                 INNER JOIN Turma t ON a.idTurma = t.idTurma
                 INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
@@ -63,24 +88,25 @@ def listar_alunos(id_professor, termo_busca=None, id_turma=None):
             """
             params = [id_professor]
 
-            # Filtro por Nome
             if termo_busca:
                 query += " AND a.nomeCompleto LIKE %s"
                 params.append(f"%{termo_busca}%")
 
-            # Filtro por Turma
-            if id_turma and id_turma != 'todos':
+            if id_turma and id_turma != 'todos' and id_turma != 'None':
                 query += " AND t.idTurma = %s"
                 params.append(id_turma)
 
-            query += " ORDER BY a.nomeCompleto ASC"
+            query += " ORDER BY a.nomeCompleto ASC LIMIT %s OFFSET %s"
+            params.extend([limite, offset])
+
             cursor.execute(query, tuple(params))
             resultados = cursor.fetchall()
+            
         finally:
             cursor.close()
             conn.close()
-    return resultados
-
+            
+    return resultados, total_registros
 
 def obter_aluno_por_id(id_aluno):
     conn = get_db_connection()

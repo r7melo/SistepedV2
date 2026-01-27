@@ -83,7 +83,54 @@
             </tbody>
         </table>
     </div>
+
+    {% if total_paginas > 1 %}
+    <div class="pagination-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e5e7eb;">
+        
+        <div class="pagination-info" style="color: #6b7280; font-size: 0.9rem;">
+            Página <strong>{{ pagina_atual }}</strong> de {{ total_paginas }}
+        </div>
+
+        <div class="pagination-nav" style="display: flex; gap: 8px;">
+            {% if pagina_atual > 1 %}
+                <a href="{{ url_for('alunos.index', pagina=pagina_atual-1, busca=busca_atual, turma_id=turma_atual) }}" class="btn-pagination">Anterior</a>
+            {% endif %}
+
+            {% for p in range(1, total_paginas + 1) %}
+                {% if p == pagina_atual %}
+                    <span class="btn-pagination active">{{ p }}</span>
+                {% elif p <= 3 or p > total_paginas - 2 or (p >= pagina_atual - 1 and p <= pagina_atual + 1) %}
+                    <a href="{{ url_for('alunos.index', pagina=p, busca=busca_atual, turma_id=turma_atual) }}" class="btn-pagination">{{ p }}</a>
+                {% elif p == 4 or p == total_paginas - 2 %}
+                    <span style="color: #9ca3af;">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagina_atual < total_paginas %}
+                <a href="{{ url_for('alunos.index', pagina=pagina_atual+1, busca=busca_atual, turma_id=turma_atual) }}" class="btn-pagination">Próxima</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+    .btn-pagination {
+        padding: 6px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #374151;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .btn-pagination:hover { background: #f9fafb; border-color: #d1d5db; }
+    .btn-pagination.active {
+        background: #111827;
+        color: #fff;
+        border-color: #111827;
+    }
+</style>
 
 <div id="importModal" class="modal-overlay">
     <div class="modal-content">

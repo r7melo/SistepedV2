@@ -6,22 +6,35 @@ from ..services.turma_service import listar_turmas
 
 alunos_bp = Blueprint('alunos', __name__, url_prefix='/alunos')
 
-@alunos_bp.route('/', methods=['GET'])
+
+import math
+
+@alunos_bp.route('/')
 def index():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
-    # Captura os filtros da URL (GET)
+    # Parâmetros da URL
+    pagina = request.args.get('pagina', 1, type=int)
     busca = request.args.get('busca', '')
-    turma_filtrada = request.args.get('turma_id', 'todos')
+    turma_id = request.args.get('turma_id', 'todos')
+    limite = 10 # Alunos por página
 
-    lista_alunos = listar_alunos(session['user_id'], termo_busca=busca, id_turma=turma_filtrada)
-    lista_turmas = listar_turmas(session['user_id'])
+    # Chama o service
+    alunos, total = listar_alunos(session['user_id'], busca, turma_id, pagina, limite)
+    
+    # Dados auxiliares para o template
+    turmas = listar_turmas(session['user_id'])
+    total_paginas = math.ceil(total / limite)
 
     return render_template('alunos/alunos.html', 
-                           alunos=lista_alunos, 
-                           turmas=lista_turmas,
-                           busca_atual=busca, 
-                           turma_atual=turma_filtrada)
+                           alunos=alunos, 
+                           turmas=turmas,
+                           total_paginas=total_paginas, 
+                           pagina_atual=pagina,
+                           busca_atual=busca,
+                           turma_atual=turma_id)
+
+
 
 @alunos_bp.route('/cadastrar_aluno', methods=['GET', 'POST'])
 def cadastrar_aluno():
