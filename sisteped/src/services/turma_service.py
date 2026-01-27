@@ -1,6 +1,6 @@
 from .db import get_db_connection
 
-def listar_turmas(id_professor):
+def listar_turmas(id_professor, busca=''):
     """Lista apenas as turmas vinculadas ao professor logado"""
     conn = get_db_connection()
     resultados = []
@@ -13,10 +13,11 @@ def listar_turmas(id_professor):
                 SELECT t.idTurma, t.nome, t.anoLetivo 
                 FROM Turma t
                 INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
-                WHERE pt.idProfessor = %s
+                WHERE pt.idProfessor = %s 
+                AND t.nome LIKE %s
                 ORDER BY t.nome ASC
             """
-            cursor.execute(query, (id_professor,))
+            cursor.execute(query, (id_professor, f'%{busca}%'))
             resultados = cursor.fetchall()
         except Exception as e:
             print(f"Erro ao listar turmas: {e}")

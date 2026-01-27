@@ -8,9 +8,10 @@ def index():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
-    lista_de_turmas = listar_turmas(session['user_id'])
-    
-    return render_template('turmas/turmas.html', turmas=lista_de_turmas)
+    busca = request.args.get('busca', '')
+    lista_de_turmas = listar_turmas(session['user_id'], busca)
+
+    return render_template('turmas/turmas.html', turmas=lista_de_turmas, busca_atual=busca)
 
 
 @turmas_bp.route('/cadastrar_turma', methods=['GET', 'POST'])
