@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h2>Gerar Relatório de Notas</h2>
+        <p>Selecione os filtros para exportar o histórico de avaliações em CSV.</p>
+    </div>
+
+    <div class="content-card" style="max-width: 700px; margin: 0 auto;">
+        <form action="{{ url_for('relatorios.exportar') }}" method="POST">
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">1. Selecione a Turma</label>
+                    <select name="turma" class="form-control" required>
+                        <option value="" disabled selected>Escolha uma turma...</option>
+                        {% for t in turmas %}
+                            <option value="{{ t.idTurma }}">{{ t.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-col">
+                    <label class="form-label">2. Disciplina</label>
+                    <select name="disciplina" class="form-control" required>
+                        <option value="" disabled selected>Escolha a disciplina...</option>
+                        {% for d in disciplinas %}
+                            <option value="{{ d.nome }}">{{ d.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 20px;">
+                <div class="form-col">
+                    <label class="form-label">3. Data Inicial</label>
+                    <input type="date" name="data_inicio" class="form-control" required>
+                </div>
+                <div class="form-col">
+                    <label class="form-label">4. Data Final</label>
+                    <input type="date" name="data_fim" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 30px; justify-content: center;">
+                <button type="submit" class="btn-black btn-wide" style="width: 100%;">
+                    Baixar Histórico de Notas
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
