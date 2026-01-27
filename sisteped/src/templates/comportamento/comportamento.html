@@ -6,12 +6,48 @@
         <h2>Gestão de Comportamentos</h2>
     </div>
 
+    <div class="toolbar">
+        <form action="{{ url_for('comportamento.index') }}" method="GET" style="display: flex; width: 100%; gap: 12px; align-items: center;">
+            <div class="toolbar-left" style="display: flex; flex: 1; gap: 12px;">
+                
+                <div class="search-box" style="position: relative; display: flex; align-items: center;">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    
+                    <input type="text" name="busca" placeholder="Buscar por nome do aluno..." value="{{ busca_atual or '' }}" id="inputBusca" style="padding-right: 30px;">
+
+                    {% if busca_atual and busca_atual != '' %}
+                    <a href="{{ url_for('comportamento.index', tag=tag_atual) }}" title="Limpar busca" style="position: absolute; right: 10px; color: #9ca3af; text-decoration: none; font-size: 20px; font-weight: bold; cursor: pointer; line-height: 1;">
+                        &times;
+                    </a>
+                    {% endif %}
+                </div>
+
+                <select name="tag" class="form-control" style="width: 220px; height: 38px;" onchange="this.form.submit()">
+                    <option value="todas" {% if tag_atual == 'todas' %}selected{% endif %}>Todos os Tipos</option>
+                    {% for t in tags_existentes %}
+                        <option value="{{ t.tag }}" {% if tag_atual == t.tag %}selected{% endif %}>
+                            {{ t.tag }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="button" class="btn-black small" onclick="openAddModal()">
+                    Registrar Novo
+                </button>
+            </div>
+        </form>
+    </div>
+
     <div class="table-responsive">
         <table class="clean-table">
             <thead>
                 <tr>
                     <th>Aluno</th>
-                    <th>Tipo (Tag)</th>
+                    <th>Tipo</th>
                     <th>Observação</th>
                     <th class="text-right">Ações</th>
                 </tr>
@@ -39,35 +75,43 @@
             </tbody>
         </table>
     </div>
-
-    <div class="toolbar" style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;">
-        <button class="btn-black" style="padding: 12px 30px; font-size: 1rem;" onclick="openAddModal()">
-            Registrar Novo Comportamento
-        </button>
-    </div>
 </div>
-
-
 
 <div id="addModal" class="modal-overlay">
     <div class="modal-content">
-        <h3>Novo Registro</h3>
+        <header style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <h3 class="section-title" style="margin:0">Novo Registro de Comportamento</h3>
+            <button onclick="closeAddModal()" style="background:none; border:none; font-size:24px; cursor:pointer">&times;</button>
+        </header>
+
         <form action="{{ url_for('comportamento.cadastrar') }}" method="POST">
             <div style="margin-bottom: 15px;">
-                <label class="form-label">Aluno</label>
-                <select name="id_aluno" class="form-control" required>
-                    <option value="" disabled selected>Selecione o aluno...</option>
-                    {% for a in alunos %} 
-                        <option value="{{ a.idAluno }}">{{ a.nomeCompleto }}</option> 
+                <label class="form-label">1. Selecionar Turma</label>
+                <select id="selectTurmaModal" class="form-control" onchange="filtrarAlunosPorTurma()" required>
+                    <option value="" disabled selected>Escolha a turma...</option>
+                    {% for t in turmas %}
+                        <option value="{{ t.idTurma }}">{{ t.nome }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div style="margin-bottom: 15px;">
-                <label class="form-label">Tag (Tipo)</label>
+                <label class="form-label">2. Aluno</label>
+                <select name="id_aluno" id="selectAlunoModal" class="form-control" required disabled>
+                    <option value="" disabled selected>Selecione a turma primeiro...</option>
+                    {% for a in alunos %} 
+                        <option value="{{ a.idAluno }}" data-turma="{{ a.idTurma }}" style="display: none;">
+                            {{ a.nomeCompleto }}
+                        </option> 
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label class="form-label">3. Tipo</label>
                 <div style="display: flex; gap: 8px;">
                     <select name="tag_existente" id="tagSelect" class="form-control" onchange="atualizarObs()">
-                        <option value="" disabled selected>Selecionar tag existente...</option>
+                        <option value="" disabled selected>Selecionar tipo existente...</option>
                         {% for t in tags_existentes %}
                             <option value="{{ t.tag }}" data-obs="{{ t.observacao }}">{{ t.tag }}</option>
                         {% endfor %}
@@ -81,14 +125,14 @@
             </div>
 
             <div style="margin-bottom: 15px;">
-                <label class="form-label">Observação</label>
+                <label class="form-label">4. Observação</label>
                 <textarea name="observacao" id="obsField" class="form-control" rows="3" readonly></textarea>
                 <input type="hidden" name="modo_escrita" id="modoEscrita" value="false">
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancelar</button>
-                <button type="submit" class="btn-black">Salvar</button>
+            <div class="modal-footer" style="display: flex; gap: 10px;">
+                <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddModal()">Cancelar</button>
+                <button type="submit" class="btn-black" style="flex: 2;">Salvar Registro</button>
             </div>
         </form>
     </div>
@@ -110,6 +154,32 @@
 </div>
 
 <script>
+
+    function filtrarAlunosPorTurma() {
+        const turmaId = document.getElementById('selectTurmaModal').value;
+        const selectAluno = document.getElementById('selectAlunoModal');
+        const optionsAlunos = selectAluno.options;
+
+        selectAluno.disabled = false;
+        selectAluno.value = ""; 
+
+        let encontrouAlunos = false;
+
+        for (let i = 1; i < optionsAlunos.length; i++) {
+            const idTurmaAluno = optionsAlunos[i].getAttribute('data-turma');
+            
+            if (idTurmaAluno === turmaId) {
+                optionsAlunos[i].style.display = 'block';
+                encontrouAlunos = true;
+            } else {
+                optionsAlunos[i].style.display = 'none';
+            }
+        }
+
+
+        optionsAlunos[0].innerText = encontrouAlunos ? "Selecione o aluno..." : "Nenhum aluno nesta turma";
+    }
+    
     // Lógica de Alternância entre Select e Input
     function toggleModo() {
         const select = document.getElementById('tagSelect');

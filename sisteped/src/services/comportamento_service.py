@@ -1,23 +1,43 @@
 from .db import get_db_connection
 
-def listar_comportamentos_professor(id_professor):
-    """Lista os registros de comportamento vinculados ao professor logado."""
+def listar_comportamentos_professor(id_professor, busca='', tag='todas'):
+    """Lista os registros de comportamento vinculados ao professor logado com filtros."""
     conn = get_db_connection()
     if not conn: return []
     try:
         cursor = conn.cursor(dictionary=True)
+        
+        # Base da Query
         query = """
             SELECT c.idComportamento, c.tag, c.observacao, a.nomeCompleto as nome_aluno
             FROM Comportamento c
             INNER JOIN Aluno a ON c.idAluno = a.idAluno
             WHERE c.idProfessor = %s
-            ORDER BY a.nomeCompleto ASC
         """
-        cursor.execute(query, (id_professor,))
+        params = [id_professor]
+
+        # Filtro por Nome do Aluno
+        if busca:
+            query += " AND a.nomeCompleto LIKE %s"
+            params.append(f"%{busca}%")
+
+        # Filtro por Tag (Tipo de Comportamento)
+        # Só adiciona o filtro se for diferente de 'todas' ou 'None'
+        if tag and tag != 'todas' and tag != 'None':
+            query += " AND c.tag = %s"
+            params.append(tag)
+
+        query += " ORDER BY a.nomeCompleto ASC"
+        
+        cursor.execute(query, tuple(params))
         return cursor.fetchall()
+    except Exception as e:
+        print(f"Erro ao listar comportamentos: {e}")
+        return []
     finally:
-        cursor.close()
-        conn.close()
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 def listar_tags_distintas_professor(id_professor):
     """Busca as tags únicas do professor para preencher o Boxlist."""

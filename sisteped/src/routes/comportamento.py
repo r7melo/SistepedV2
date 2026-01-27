@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from ..services.comportamento_service import *
+from src.routes import turmas
+from src.services.comportamento_service import excluir_comportamento_seguro, listar_comportamentos_professor, listar_tags_distintas_professor, salvar_comportamento
+from src.services.turma_service import listar_turmas
 from ..services.aluno_service import listar_alunos
 
 comportamento_bp = Blueprint('comportamento', __name__, url_prefix='/comportamento')
@@ -8,15 +10,22 @@ comportamento_bp = Blueprint('comportamento', __name__, url_prefix='/comportamen
 def index():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
+    busca = request.args.get('busca', '')
+    tag = request.args.get('tag', 'todas')
+
     id_prof = session['user_id']
-    comportamentos = listar_comportamentos_professor(id_prof)
+    comportamentos = listar_comportamentos_professor(id_prof, busca, tag)
+    turmas = listar_turmas(id_prof)
     tags_existentes = listar_tags_distintas_professor(id_prof)
     alunos = listar_alunos(id_prof)
     
     return render_template('comportamento/comportamento.html', 
                            comportamentos=comportamentos, 
                            tags_existentes=tags_existentes,
-                           alunos=alunos)
+                           alunos=alunos,
+                           busca_atual=busca,
+                           turmas=turmas,
+                           tag_atual=tag)
 
 @comportamento_bp.route('/cadastrar', methods=['POST'])
 def cadastrar():
