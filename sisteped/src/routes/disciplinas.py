@@ -12,15 +12,18 @@ def index():
     if 'user_id' not in session: 
         return redirect(url_for('auth.login'))
     
+    busca = request.args.get('busca', '')
+    
     # Filtra as disciplinas pelo professor logado
-    lista = listar_disciplinas_por_professor(session['user_id'])
-    return render_template('disciplinas/disciplinas.html', disciplinas=lista)
+    lista = listar_disciplinas_por_professor(session['user_id'], busca)
+    return render_template('disciplinas/disciplinas.html', disciplinas=lista, busca_atual=busca)
 
 @disciplinas_bp.route('/cadastrar', methods=['POST'])
 def cadastrar():
     if 'user_id' not in session: return redirect(url_for('auth.login'))
     
     nome = request.form.get('nome')
+    
     if nome:
         # Passa o ID do professor para criar o vínculo
         if criar_disciplina_com_vinculo(nome, session['user_id']):

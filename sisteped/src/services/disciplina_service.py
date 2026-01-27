@@ -1,6 +1,6 @@
 from .db import get_db_connection
 
-def listar_disciplinas_por_professor(id_professor):
+def listar_disciplinas_por_professor(id_professor, busca=''):
     """Lista apenas as disciplinas vinculadas ao professor logado."""
     conn = get_db_connection()
     resultados = []
@@ -12,10 +12,11 @@ def listar_disciplinas_por_professor(id_professor):
                 SELECT d.idDisciplina, d.nome 
                 FROM Disciplina d
                 INNER JOIN ProfessorDisciplina pd ON d.idDisciplina = pd.idDisciplina
-                WHERE pd.idProfessor = %s
+                WHERE pd.idProfessor = %s 
+                AND d.nome LIKE %s
                 ORDER BY d.nome ASC
             """
-            cursor.execute(query, (id_professor,))
+            cursor.execute(query, (id_professor, f"%{busca}%"))
             resultados = cursor.fetchall()
         except Exception as e:
             print(f"Erro ao listar disciplinas: {e}")
