@@ -1,17 +1,25 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from src.services.disciplina_service import listar_disciplinas_por_professor
 from ..services.notas_service import atualizar_nota_individual, listar_alunos_por_turma, listar_notas, listar_turmas, remover_nota_individual, salvar_avaliacao
+import math
 
 notas_bp = Blueprint('notas', __name__, url_prefix='/notas')
 
+
 @notas_bp.route('/', methods=['GET'])
 def index():
-
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
 
-    notas_brutas = listar_notas(session['user_id'])
+    id_prof = session['user_id']
+    pagina = request.args.get('pagina', 1, type=int)
+    busca = request.args.get('busca', '')
+    limite = 10
+
+    # Busca notas paginadas
+    notas_brutas, total = listar_notas(id_prof, busca, pagina, limite)
     
+    # Processa as strings de conteúdo
     for n in notas_brutas:
         conteudo = n.get('conteudo', '')
         if '(' in conteudo and conteudo.endswith(')'):
@@ -22,7 +30,15 @@ def index():
             n['atividade'] = conteudo
             n['disciplina'] = 'Geral'
 
-    return render_template('notas/notas.html', notas=notas_brutas)
+    total_paginas = math.ceil(total / limite)
+
+    return render_template('notas/notas.html', 
+                           notas=notas_brutas, 
+                           total_paginas=total_paginas,
+                           pagina_atual=pagina,
+                           busca_atual=busca)
+
+
 
 @notas_bp.route('/cadastrar_notas', methods=['GET', 'POST'])
 def cadastrar_notas():
@@ -64,7 +80,6 @@ def cadastrar_notas():
     alunos_lista = []
 
     if turma_selecionada:
-        # Busca alunos da turma validando o acesso do professor
         alunos_lista = listar_alunos_por_turma(turma_selecionada, id_professor)
 
 
@@ -79,22 +94,30 @@ def cadastrar_notas():
 
 @notas_bp.route('/atualizar_individual/<int:id>', methods=['POST'])
 def atualizar_individual(id):
-    # Pega a nova nota vinda do input 'nova_nota' do modal
+
     nova_nota = request.form.get('nova_nota')
+    pagina = request.form.get('pagina_atual', 1)
+    busca = request.form.get('busca_atual', '') 
+
+    print(pagina, busca)
     
     if atualizar_nota_individual(id, nova_nota):
         flash('Nota atualizada com sucesso!', 'success')
     else:
         flash('Erro ao atualizar nota.', 'error')
         
-    return redirect(url_for('notas.index'))
+    return redirect(url_for('notas.index', pagina=pagina, busca=busca))
+
 
 @notas_bp.route('/excluir_individual/<int:id>')
 def excluir_individual(id):
-    # Remove apenas o registro específico da tabela Avaliacao
+
+    pagina = request.args.get('pagina', 1)
+    busca = request.args.get('busca', '')
+
     if remover_nota_individual(id):
         flash('Registro de nota removido!', 'success')
     else:
         flash('Erro ao remover nota.', 'error')
-        
-    return redirect(url_for('notas.index'))
+
+    return redirect(url_for('notas.index', pagina=pagina, busca=busca))

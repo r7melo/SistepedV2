@@ -1,37 +1,44 @@
 from .db import get_db_connection
 
-def listar_notas(id_professor):
+def listar_notas(id_professor, busca='', pagina=1, limite=10):
     """Busca as notas apenas dos alunos pertencentes às turmas do professor logado."""
     conn = get_db_connection()
-    if not conn:
-        return []
+    if not conn: return [], 0
     
     try:
         cursor = conn.cursor(dictionary=True)
+        offset = (pagina - 1) * limite
+
+        # 1. Contar total de registros com filtro de busca
+        query_count = """
+            SELECT COUNT(*) as total
+            FROM Avaliacao av
+            INNER JOIN Aluno al ON av.idAluno = al.idAluno
+            INNER JOIN ProfessorTurma pt ON al.idTurma = pt.idTurma
+            WHERE pt.idProfessor = %s AND al.nomeCompleto LIKE %s
+        """
+        cursor.execute(query_count, (id_professor, f'%{busca}%'))
+        total_registros = cursor.fetchone()['total']
+
+        # 2. Buscar dados da página atual
         query = """
-            SELECT 
-                av.idAvaliacao,
-                av.nota,
-                av.data,
-                av.conteudo,
-                al.nomeCompleto AS nome_aluno,
-                t.nome AS nome_turma
+            SELECT av.idAvaliacao, av.nota, av.data, av.conteudo,
+                   al.nomeCompleto AS nome_aluno, t.nome AS nome_turma
             FROM Avaliacao av
             INNER JOIN Aluno al ON av.idAluno = al.idAluno
             INNER JOIN Turma t ON al.idTurma = t.idTurma
             INNER JOIN ProfessorTurma pt ON t.idTurma = pt.idTurma
-            WHERE pt.idProfessor = %s
+            WHERE pt.idProfessor = %s AND al.nomeCompleto LIKE %s
             ORDER BY av.data DESC
+            LIMIT %s OFFSET %s
         """
-        cursor.execute(query, (id_professor,))
-        return cursor.fetchall()
-    except Exception as e:
-        print(f"Erro ao listar notas: {e}")
-        return []
+        cursor.execute(query, (id_professor, f'%{busca}%', limite, offset))
+        notas = cursor.fetchall()
+        
+        return notas, total_registros
     finally:
-        if conn and conn.is_connected():
-            cursor.close()
-            conn.close()
+        cursor.close()
+        conn.close()
 
 def listar_turmas(id_professor):
     """Retorna apenas as turmas vinculadas ao professor logado."""

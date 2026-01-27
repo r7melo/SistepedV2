@@ -2,31 +2,35 @@
 
 {% block content %}
 <div class="page-container">
-    
     <header class="page-header">
         <h2>Histórico de Notas</h2>
     </header>
 
     <div class="toolbar">
-        <div class="toolbar-left">
-            <div class="search-box">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="inputBusca" placeholder="Buscar aluno..." onkeyup="filtrarTabela()" disabled>
+        <form action="{{ url_for('notas.index') }}" method="GET" style="display: flex; width: 100%; gap: 12px; align-items: center;">
+            <div class="toolbar-left" style="display: flex; flex: 1; gap: 12px;">
+                <div class="search-box" style="position: relative; display: flex; align-items: center;">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    <input type="text" name="busca" placeholder="Buscar aluno..." value="{{ busca_atual or '' }}" id="inputBusca" style="padding-right: 30px;">
+                    
+                    {% if busca_atual %}
+                    <a href="{{ url_for('notas.index') }}" style="position: absolute; right: 10px; color: #9ca3af; text-decoration: none; font-size: 18px;">&times;</a>
+                    {% endif %}
+                </div>
+
+                <a href="{{ url_for('notas.cadastrar_notas') }}">
+                    <button type="button" class="btn-black small">Lançar Novas</button>
+                </a>
             </div>
-
-            <button class="btn-outline">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                Filtrar
-            </button>
-
-            <a href="{{ url_for('notas.cadastrar_notas') }}">
-                <button class="btn-black small">Lançar Novas</button>
-            </a>
-        </div>
+        </form>
     </div>
 
     <div class="table-responsive">
-        <table class="clean-table" id="tabelaNotas">
+        <table class="clean-table">
             <thead>
                 <tr>
                     <th style="width: 35%;">Aluno</th>
@@ -56,24 +60,47 @@
                         </td>
                         <td class="text-gray">{{ nota.data.strftime('%d/%m/%Y') if nota.data else '-' }}</td>
                         <td class="text-right">
-                            <button class="icon-btn-edit" title="Editar" 
-                                    onclick="abrirModalEdicao('{{ nota.idAvaliacao }}', '{{ nota.nome_aluno }}', '{{ nota.nota }}')">
-                                &#9998;
-                            </button>
+                            <button class="icon-btn-edit" onclick="abrirModalEdicao('{{ nota.idAvaliacao }}', '{{ nota.nome_aluno }}', '{{ nota.nota }}')">&#9998;</button>
                         </td>
                     </tr>
                     {% endfor %}
                 {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center text-gray" style="padding: 40px;">
-                            Nenhuma nota lançada no sistema.
-                        </td>
-                    </tr>
+                    <tr><td colspan="6" class="text-center text-gray" style="padding: 40px;">Nenhum registro encontrado.</td></tr>
                 {% endif %}
             </tbody>
         </table>
     </div>
+
+    {% if total_paginas > 1 %}
+    <div class="pagination-wrapper" style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e5e7eb;">
+        <div style="color: #6b7280; font-size: 0.9rem;">Página <strong>{{ pagina_atual }}</strong> de {{ total_paginas }}</div>
+        <div style="display: flex; gap: 8px;">
+            {% if pagina_atual > 1 %}
+                <a href="{{ url_for('notas.index', pagina=pagina_atual-1, busca=busca_atual) }}" class="btn-pagination">Anterior</a>
+            {% endif %}
+
+            {% for p in range(1, total_paginas + 1) %}
+                {% if p == pagina_atual %}
+                    <span class="btn-pagination active">{{ p }}</span>
+                {% elif p <= 3 or p > total_paginas - 2 or (p >= pagina_atual - 1 and p <= pagina_atual + 1) %}
+                    <a href="{{ url_for('notas.index', pagina=p, busca=busca_atual) }}" class="btn-pagination">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagina_atual < total_paginas %}
+                <a href="{{ url_for('notas.index', pagina=pagina_atual+1, busca=busca_atual) }}" class="btn-pagination">Próxima</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+    .btn-pagination { padding: 6px 14px; border: 1px solid #e5e7eb; border-radius: 6px; text-decoration: none; color: #374151; font-size: 0.85rem; }
+    .btn-pagination.active { background: #111827; color: #fff; border-color: #111827; }
+    .btn-pagination:hover:not(.active) { background: #f9fafb; }
+</style>
+
 
 <div id="modalNota" class="modal-overlay">
     <div class="modal-content">
@@ -94,6 +121,9 @@
                 <button type="submit" class="btn-black flex-2">Salvar Alteração</button>
                 <button type="button" id="btnExcluirNota" class="btn-danger-outline flex-1">Apagar</button>
             </div>
+
+            <input type="hidden" name="pagina_atual" value="{{ pagina_atual }}">
+            <input type="hidden" name="busca_atual" value="{{ busca_atual }}">
         </form>
     </div>
 </div>
@@ -109,6 +139,7 @@
     </div>
 </div>
 
+
 <script>
     let idNotaAtual = null;
 
@@ -116,7 +147,16 @@
         idNotaAtual = id;
         document.getElementById('nomeAlunoModal').innerText = nome;
         document.getElementById('inputNotaModal').value = parseFloat(nota).toFixed(1);
-        document.getElementById('formEditarNota').action = "/notas/atualizar_individual/" + id;
+
+        // 1. Pegar os parâmetros atuais da URL (página e busca)
+        const urlParams = new URLSearchParams(window.location.search);
+        const pagina = urlParams.get('pagina') || 1;
+        const busca = urlParams.get('busca') || '';
+
+        // 2. Definir o action com a rota + os parâmetros de estado
+        const actionUrl = `/notas/atualizar_individual/${id}?pagina=${pagina}&busca=${encodeURIComponent(busca)}`;
+        document.getElementById('formEditarNota').action = actionUrl;
+
         document.getElementById('modalNota').style.display = 'flex';
     }
 
@@ -124,12 +164,21 @@
 
     function abrirConfirmacao() {
         document.getElementById('modalConfirmacao').style.display = 'flex';
+        
+        // Pegar os valores da URL atual para não perdê-los ao deletar
+        const urlParams = new URLSearchParams(window.location.search);
+        const pag = urlParams.get('pagina') || 1;
+        const bus = urlParams.get('busca') || '';
+
         document.getElementById('btnConfirmarExclusaoFinal').onclick = function() {
-            window.location.href = "/notas/excluir_individual/" + idNotaAtual;
+            // Envia os parâmetros na URL para a rota de exclusão
+            window.location.href = `/notas/excluir_individual/${idNotaAtual}?pagina=${pag}&busca=${bus}`;
         };
     }
 
-    function fecharConfirmacao() { document.getElementById('modalConfirmacao').style.display = 'none'; }
+    function fecharConfirmacao() { 
+        document.getElementById('modalConfirmacao').style.display = 'none';
+    }
 
     document.getElementById('btnExcluirNota').onclick = (e) => {
         e.preventDefault();
