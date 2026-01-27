@@ -20,20 +20,21 @@ def obter_resumo_comportamento(id_turma):
         conn.close()
 
 def obter_timeline_notas(id_turma):
-    """Calcula a média mensal das notas da turma para o gráfico de linha."""
+    """Calcula a média mensal das notas respeitando o ano para evitar sobreposição."""
     conn = get_db_connection()
     if not conn: return []
     try:
         cursor = conn.cursor(dictionary=True)
+        # Adicionamos o ano no DATE_FORMAT e no GROUP BY
         query = """
             SELECT 
-                DATE_FORMAT(av.data, '%b') as mes,
+                DATE_FORMAT(av.data, '%m/%Y') as mes_ano,
                 AVG(av.nota) as media
             FROM Avaliacao av
             INNER JOIN Aluno a ON av.idAluno = a.idAluno
             WHERE a.idTurma = %s
-            GROUP BY MONTH(av.data), mes
-            ORDER BY MONTH(av.data)
+            GROUP BY YEAR(av.data), MONTH(av.data), mes_ano
+            ORDER BY YEAR(av.data) ASC, MONTH(av.data) ASC
         """
         cursor.execute(query, (id_turma,))
         return cursor.fetchall()

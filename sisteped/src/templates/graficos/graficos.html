@@ -175,21 +175,50 @@ canvas { max-width: 100% !important; }
 
     function renderTimeline(dados) {
         if (charts.line) charts.line.destroy();
+        
+       
+        const labels = dados.map(d => d.mes_ano);
+        const valores = dados.map(d => d.media);
+
         charts.line = new Chart(document.getElementById('timelineChart'), {
             type: 'line',
             data: {
-                labels: dados.map(d => d.mes),
+                labels: labels,
                 datasets: [{ 
-                    label: 'Média', 
-                    data: dados.map(d => d.media), 
+                    label: 'Média Mensal da Turma', 
+                    data: valores, 
                     borderColor: '#000', 
                     backgroundColor: 'rgba(0,0,0,0.02)',
                     fill: true,
                     tension: 0.4,
-                    borderWidth: 3
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#000'
                 }]
             },
-            options: { ...commonOptions, plugins: { legend: { display: true, position: 'top', align: 'end' } } }
+            options: { 
+                ...commonOptions, 
+                plugins: { 
+                    legend: { display: true, position: 'top', align: 'end' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Média: ${context.parsed.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: { stepSize: 2 }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
         });
     }
 
