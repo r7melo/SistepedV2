@@ -42,19 +42,18 @@ def obter_timeline_notas(id_turma):
         conn.close()
 
 def obter_medias_disciplinas(id_turma):
-    """Calcula a média por disciplina (extraída do conteúdo entre parênteses)."""
     conn = get_db_connection()
     if not conn: return []
     try:
         cursor = conn.cursor(dictionary=True)
-        # Lógica SQL para extrair o que está entre '(' e ')' no campo conteudo
+        # Extrai o texto entre os últimos parênteses do campo 'conteudo'
         query = """
             SELECT 
-                SUBSTRING_INDEX(SUBSTRING_INDEX(av.conteudo, '(', -1), ')', 1) as disciplina,
-                AVG(av.nota) as media
+                TRIM(REPLACE(SUBSTRING_INDEX(av.conteudo, '(', -1), ')', '')) as disciplina,
+                ROUND(AVG(av.nota), 2) as media
             FROM Avaliacao av
             INNER JOIN Aluno a ON av.idAluno = a.idAluno
-            WHERE a.idTurma = %s
+            WHERE a.idTurma = %s AND av.conteudo LIKE '%(%%)%'
             GROUP BY disciplina
         """
         cursor.execute(query, (id_turma,))

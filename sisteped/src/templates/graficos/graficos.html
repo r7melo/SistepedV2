@@ -194,14 +194,47 @@ canvas { max-width: 100% !important; }
     }
 
     function renderSubjects(dados) {
+    
         if (charts.bar) charts.bar.destroy();
-        charts.bar = new Chart(document.getElementById('subjectChart'), {
+        
+        const ctx = document.getElementById('subjectChart').getContext('2d');
+        
+        charts.bar = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: dados.map(d => d.disciplina),
-                datasets: [{ data: dados.map(d => d.media), backgroundColor: '#111827', borderRadius: 4 }]
+                
+                labels: dados.map(d => d.disciplina), 
+                datasets: [{
+                    label: 'Média da Turma',
+                    data: dados.map(d => d.media), 
+                    backgroundColor: '#111827',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }]
             },
-            options: { ...commonOptions, indexAxis: 'y' }
+            options: {
+                indexAxis: 'y', 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { 
+                        beginAtZero: true, 
+                        max: 10,
+                        grid: { color: '#f3f4f6' },
+                        ticks: { color: '#9ca3af' }
+                    },
+                    y: { 
+                        grid: { display: false },
+                        ticks: { 
+                            color: '#111827',
+                            font: { weight: '600', size: 12 }
+                        }
+                    }
+                }
+            }
         });
     }
 
@@ -221,5 +254,7 @@ canvas { max-width: 100% !important; }
             options: commonOptions
         });
     }
+
+    
 </script>
 {% endblock %}
