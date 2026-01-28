@@ -1,5 +1,7 @@
 # Guia do Desenvolvedo
 
+Para a realização de todo o desenvolvimento do projeto, e execuções de comandos, o desenvolvedor deve se encontrar dentro da pasta: `sisteped/`.
+
 ## 1. Versão do Python
 
 Obrigatório: **Python 3.12.10**
