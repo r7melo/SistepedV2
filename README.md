@@ -1,131 +1,168 @@
-# Sisteped - Sistema de Gestão Pedagógica
+# SISTEPED — Sistema de Gestão Pedagógica
 
-Uma ferramenta prática para professores: este projeto oferece um aplicativo que centraliza o gerenciamento de turmas e alunos, permitindo acompanhar notas, desempenho por conteúdo e comportamentos individuais. Com ele, o professor consegue identificar padrões, acompanhar a evolução de cada aluno e tomar decisões pedagógicas mais eficazes, tudo de forma intuitiva, rápida e personalizada. É um sistema que coloca o controle e a clareza nas mãos do professor, facilitando o ensino e fortalecendo o acompanhamento do aprendizado.
+## 1. Descrição do Projeto
 
----
-
-## 1. Requisitos Funcionais (por Módulo)
-
-### **Módulo ALU – Alunos**
-**ALU-01 – Cadastro de Alunos**  
-- Adicionar, editar e remover alunos.  
-- Armazenar informações básicas: nome, idade, turma, contato opcional.
-
-**ALU-02 – Histórico do Aluno**  
-- Visualizar histórico consolidado de notas e comportamentos por aluno.
-
-**ALU-03 – Busca e Filtros de Alunos**  
-- Buscar alunos por nome, turma ou tags de comportamento/desempenho.
+O **SISTEPED** é um sistema de gestão pedagógica voltado para professores, com foco
+no acompanhamento de turmas, alunos, avaliações e indicadores de desempenho.  
+Seu objetivo central é oferecer uma visão estruturada e confiável da evolução
+pedagógica por conteúdo, apoiando a tomada de decisões no processo de ensino.
 
 ---
 
-### **Módulo TUR – Turmas**
-**TUR-01 – Gerenciamento de Turmas**  
-- Criar turmas personalizadas.  
-- Adicionar ou remover alunos de cada turma.
+## 2. Arquitetura do Sistema
 
-**TUR-02 – Visão Geral da Turma**  
-- Exibir resumo de desempenho médio da turma (notas e comportamentos).
+O Sisteped utiliza uma arquitetura baseada em **micro-serviços containerizados**
+em conjunto com o padrão **MVC (Model-View-Controller)**, adaptado ao framework Flask.
 
----
+- **Camada de Visão (View):**  
+  Templates HTML renderizados no lado do servidor utilizando **Jinja2**.
 
-### **Módulo NOT – Notas**
-**NOT-01 – Registro de Notas**  
-- Lançar notas para cada aluno.  
-- Adicionar tags às notas para identificar conteúdos ou competências.  
-- Visualizar histórico de notas por aluno ou turma.
+- **Camada de Controle (Controller):**  
+  Rotas organizadas em **Blueprints**, responsáveis por gerenciar as requisições HTTP.
 
-**NOT-02 – Média e Estatísticas**  
-- Calcular média automática por conteúdo, aluno e turma.
+- **Camada de Serviço (Service):**  
+  Lógica de negócio e persistência de dados isoladas das rotas, promovendo separação
+  de responsabilidades.
 
-**NOT-03 – Notas por Conteúdo**  
-- Filtrar notas por matéria, conteúdo ou competência específica.
+- **Banco de Dados (Database):**  
+  MySQL, utilizado para persistência relacional dos dados.
 
 ---
 
-### **Módulo COM – Comportamentos**
-**COM-01 – Registro de Comportamentos**  
-- Criar cards de comportamento com descrição e tipo.  
-- Associar comportamentos a alunos.  
-- Registrar histórico por aluno e turma.
+## 3. Tecnologias Utilizadas
 
-**COM-02 – Métricas de Frequência**  
-- Analisar padrões de comportamentos positivos/negativos por período.
-
----
-
-### **Módulo MON – Monitoramento e Análises**
-**MON-01 – Análises Acadêmicas**  
-- Gráficos e indicadores de desempenho por conteúdo.
-
-**MON-02 – Análises Comportamentais**  
-- Frequência por tipo de comportamento.
-
-**MON-03 – Comparação Temporal**  
-- Comparar evolução de alunos ao longo do tempo.
-
-**MON-04 – Painel Geral do Professor**  
-- Dashboard com visão agregada do semestre, turmas e alertas.
+- **Linguagem / Backend:** Python 3.12.10  
+- **Framework Web:** Flask 3.1.2  
+- **Frontend:** HTML5, CSS3 (customizado) e JavaScript (Vanilla)  
+- **Banco de Dados:** MySQL 8.0  
+- **Servidor WSGI:** Gunicorn (ambiente de produção)  
+- **Infraestrutura:** Docker e Docker Compose  
 
 ---
 
-### **Módulo REL – Relatórios**
-**REL-01 – Exportação e Relatórios**  
-- Gerar relatórios para impressão ou compartilhamento.  
-- Exportar dados para CSV ou PDF.
+## 4. Padrões e Convenções
 
-**REL-02 – Relatório Consolidado da Turma**  
-- Documento com notas, médias, estatísticas e análises de comportamento.
+- **Nomenclatura:**  
+  Funções e variáveis seguem o padrão `snake_case`, conforme a PEP 8.
 
----
+- **Organização de Rotas:**  
+  Uso de **Blueprints** para modularização por domínio funcional  
+  (Disciplina, Turmas, Alunos, Notas e Comportamento).
 
-### **Módulo SYS – Sistema / Infraestrutura**
-**SYS-01 – Armazenamento Local**  
-- Banco de dados local para salvar todas as informações.  
-- Funcionamento offline.
+- **Segurança:**  
+  Criptografia de senhas utilizando `generate_password_hash` e validação com
+  `check_password_hash` da biblioteca **Werkzeug**.
 
-**SYS-02 – Backup Local Manual**  
-- Exportar e importar backups do banco local.
-
-**SYS-03 – Tema Claro/Escuro**  
-- Alternar entre dois temas para melhorar a usabilidade.
+- **Isolamento de Dados:**  
+  Todas as consultas SQL são filtradas obrigatoriamente pelo `idProfessor`
+  presente na sessão, garantindo privacidade entre usuários.
 
 ---
 
-## 2. Requisitos Não Funcionais (Metrificados)
+## 5. Estrutura do Código
 
-1. **Usabilidade**
-   - Tempo médio para realizar ações comuns (ex.: lançar nota) ≤ **5 segundos**.
-   - Usuário deve conseguir localizar qualquer função principal em até **3 cliques**.
-
-2. **Performance**
-   - Operações de cadastro, edição e remoção devem responder em **< 200 ms**.  
-   - Consultas com filtros devem carregar em até **1 segundo**, mesmo com 300+ alunos.
-
-3. **Segurança**
-   - Dados locais devem estar armazenados com criptografia AES-256 ou equivalente.  
-   - Processo de backup deve gerar arquivo íntegro em **100%** das tentativas.
-
-4. **Portabilidade**
-   - Compatível com Windows, Linux e macOS.  
-   - Interface deve se adaptar corretamente a telas entre **768px e 4K**.
-
-5. **Escalabilidade**
-   - Arquitetura deve permitir adicionar novos módulos sem refatorações extensas, com impacto máximo de **< 10%** sobre módulos já existentes.  
-   - Banco local deve suportar crescimento até **10 mil registros** sem perda de performance significativa.
-
----
-## Diagrama de Relacionamento
-![](docs/design/imagens/Diagram%20de%20Classes%20-%20Sisteped.png)
-
-## Casos de Uso
-Pasta: `/docs/casos de uso/`
-
-![](docs/design/imagens/use%20cases.png)
+```text
+/sisteped
+ ├── run.py          # Script de entrada da aplicação
+ └── src/
+     ├── main.py     # Configuração do Flask e registro dos Blueprints
+     ├── routes/     # Definição dos endpoints HTTP
+     ├── services/   # Lógica de negócio e acesso ao MySQL
+     ├── static/     # Arquivos estáticos (CSS, JS, imagens)
+     └── templates/  # Templates HTML (Jinja2)
+```
 
 ---
 
-## 3. Design (Protótipo)
+## 6. Instalação e Execução (Docker)
 
-- **Protótipo Figma:** [Sisteped no Figma](https://www.figma.com/design/WE4tHmzitXWEictT3dCRfe/Sisteped?node-id=0-1&p=f&t=riyhdJc2rPYz6J4X-0)
-- **Como acessar:** Clique no link acima; caso seja solicitado, faça login no Figma. O protótipo está compartilhado por link — verifique as permissões se não conseguir visualizar.
+A aplicação é totalmente containerizada, garantindo consistência entre os
+ambientes de desenvolvimento e produção.
+
+### Passos
+
+1. Certifique-se de ter **Docker** e **Docker Compose** instalados  
+2. Na raiz do projeto, execute:
+
+   ```bash
+   docker-compose up --build -d
+   ```
+
+3. Acesse a aplicação em:  
+   http://localhost:5000
+
+---
+
+## 7. Configuração do Banco de Dados
+
+- **Host:** localhost (porta 3306)  
+- **Usuário:** root  
+- **Senha:** DB!pass00  
+- **Banco:** sisteped  
+
+A persistência é garantida através de volumes Docker (`mysql_data`), evitando
+perda de dados em reinicializações dos containers.
+
+---
+
+## 8. Deploy
+
+O deploy é realizado via **Docker**, assegurando que o ambiente de produção seja
+idêntico ao de desenvolvimento.
+
+- Variáveis de ambiente (`DB_HOST`, `DB_USER`, `DB_PASSWORD`) são injetadas no
+  container da aplicação para conexão segura com o banco de dados.
+
+## 9. Documentação do Projeto
+
+O repositório contém documentação complementar essencial para compreensão,
+manutenção e evolução do sistema. Localiza-se na pasta `docs/` na raiz do projeto.
+
+### `docs/database/`
+
+Esta pasta concentra **todo o projeto da base de dados**, incluindo:
+
+- Modelo relacional completo do sistema  
+- **Diagrama Entidade–Relacionamento (DER)**  
+- Scripts SQL de criação, relacionamento e integridade  
+- Definição de chaves primárias, estrangeiras e regras de consistência  
+
+Ela serve como referência única para qualquer alteração ou auditoria estrutural
+no banco de dados.
+
+### `docs/projeto/`
+
+A pasta de projeto contém a **documentação lógica e funcional do sistema**, sendo
+o principal guia para desenvolvedores.
+
+Nela encontram-se:
+
+- **Casos de uso** do sistema  
+- **Diagramas de Caso de Uso**, descrevendo interações entre usuários e sistema  
+- Regras de negócio e fluxos principais  
+- Base conceitual necessária para implementar novas funcionalidades ou refatorar
+  módulos existentes  
+
+### `docs/design/`
+
+Esta pasta concentra a parte de **design e experiência do usuário**, contendo:
+
+- **Protótipos de interface**  
+- Especificações visuais e estruturais  
+- Diretrizes de layout e organização das telas  
+
+Ela define como o projeto deve se apresentar visualmente e garante consistência
+entre implementação e concepção original.
+
+### `docs/desenvolvimento/`
+
+Esta pasta contém os manuais excenciais para desenvolvimento do projeto.
+
+- **Manual do DBA**: regras importantes sobre o desenvolvimento da base de dados
+- **Manual do DEV**: regras importantes sober o desenvolvimento do projeto
+
+### `docs/infra/`
+
+Esta pasta contém o manual excencial para o deploy.
+
+- **Manual do DEVOPS**: regras importantes para o gerenciamento dos deploys e monitoramento

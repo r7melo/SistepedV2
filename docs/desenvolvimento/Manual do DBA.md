@@ -8,8 +8,7 @@ do banco de dados MySQL utilizando Docker.
 ```
 database/
 ├── docker-compose.yml   # Definição do container e volumes
-├── init.sql             # Script SQL executado apenas na 1ª criação
-└── DBA.txt              # Este arquivo de documentação
+└── init.sql             # Script SQL executado apenas na 1ª criação
 ```
 
 ## 2. TECNOLOGIAS E VERSÕES
