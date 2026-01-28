@@ -137,6 +137,7 @@ o principal guia para desenvolvedores.
 
 Nela encontram-se:
 
+- **Documentação técnica** do sistema
 - **Casos de uso** do sistema  
 - **Diagramas de Caso de Uso**, descrevendo interações entre usuários e sistema  
 - Regras de negócio e fluxos principais  
